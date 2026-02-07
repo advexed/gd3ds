@@ -1,4 +1,6 @@
 #pragma once
+#include "objects.h"
+
 #define MAX_GROUPS_PER_OBJECT 20
 
 #define SECTION_HASH_SIZE 600
@@ -23,6 +25,8 @@ typedef struct {
     float x, y;
     float rotation;
     int zlayer, zorder;
+    unsigned short col_channel;
+    unsigned short detail_col_channel;
     unsigned char flippedH, flippedV;
 } Object;
 
@@ -42,3 +46,5 @@ char *decompress_level(char *data);
 int load_level(char *path);
 void unload_level();
 Section *get_or_create_section(int x);
+bool obj_has_main(const GameObject *obj);
+bool obj_has_detail(const GameObject *obj);

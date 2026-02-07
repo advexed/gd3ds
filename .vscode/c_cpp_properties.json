@@ -7,7 +7,8 @@
                 "/opt/devkitpro/libctru/include",
                 "/opt/devkitpro/devkitARM/arm-none-eabi/include",
                 "/opt/devkitpro/devkitARM/lib/gcc/arm-none-eabi/*/include",
-                "/opt/devkitpro/portlibs/3ds/include"
+                "/opt/devkitpro/portlibs/3ds/include",
+                "${workspaceFolder}/libraries"
             ],
             "defines": [
                 "__3DS__"

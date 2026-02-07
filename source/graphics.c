@@ -1,10 +1,12 @@
 #include "graphics.h"
 #include "objects.h"
 #include "main.h"
+#include "color_channels.h"
 
 int sprite_count = 0;
 
 C2D_SpriteSheet spriteSheet;
+C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet bgSheet;
 C2D_Sprite bg;
 
@@ -34,15 +36,25 @@ float mirror_angle(float angle, bool hflip, bool vflip)
     return normalize_angle(angle);
 }
 
+static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
+	if (index < SPRITESHEET2_START) {
+		*rel_index = index;
+		return &spriteSheet;
+	}
+
+	*rel_index = index - SPRITESHEET2_START;
+	return &spriteSheet2;
+}
+
 static void spawn_sprite_c2d(
-    C2D_Sprite* out,
-    C2D_SpriteSheet sheet,
+    C2D_Sprite *out,
+    C2D_SpriteSheet *sheet,
     int texture,
     float x, float y,
     float scale_x, float scale_y,
     float rotation
 ) {
-    C2D_SpriteFromSheet(out, sheet, texture);
+    C2D_SpriteFromSheet(out, *sheet, texture);
     C2D_SpriteSetCenter(out, 0.5f, 0.5f);
     C2D_SpriteSetPos(out, x, y);
     C2D_SpriteSetScale(out, scale_x, scale_y);
@@ -51,10 +63,19 @@ static void spawn_sprite_c2d(
 	C3D_TexSetFilter(out->image.tex, GPU_NEAREST, GPU_NEAREST);
 }
 
+int get_color_channel(int col_type, Object *obj, const GameObject *game_obj) {
+	int col_channel = 0;
+	if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
+	else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
+	else if (!obj_has_main(game_obj) && col_type == COLOR_TYPE_DETAIL) col_channel = obj->col_channel;
+	else if (col_type == COLOR_TYPE_BASE) col_channel = obj->col_channel;
+	else if (col_type == COLOR_TYPE_DETAIL) col_channel = obj->detail_col_channel;
+	return col_channel;
+}
+
 void spawn_object_at(
 	Object *obj_game,
     int id,
-    C2D_SpriteSheet sheet,
     float x,
     float y,
 	float deg,
@@ -85,10 +106,13 @@ void spawn_object_at(
 		float p_x = x + rot_x * scale;
 		float p_y = y + rot_y * scale;
 
+		int texture;
+		C2D_SpriteSheet *sheet = get_sprite_sheet(obj->texture, &texture);
+
 		spawn_sprite_c2d(
 			&root,
 			sheet,
-			obj->texture,
+			texture,
 			floorf(p_x),
 			floorf(p_y),
 			scale * flip_x_mult, 
@@ -99,6 +123,9 @@ void spawn_object_at(
 		viewable_objects[sprite_count].spr = root;
 		viewable_objects[sprite_count].obj = obj_game;
 		viewable_objects[sprite_count].layer = 0;
+		viewable_objects[sprite_count].col_type = obj->color_type;
+		viewable_objects[sprite_count].opacity = obj->opacity;
+		viewable_objects[sprite_count].col_channel = get_color_channel(obj->color_type, obj_game, obj);
 		viewable_objects_ptr[sprite_count] = &viewable_objects[sprite_count];
 		sprite_count++;
 	}
@@ -121,11 +148,14 @@ void spawn_object_at(
 
             int c_flip_x_mult = (c->flip_x ? -1 : 1);
             int c_flip_y_mult = (c->flip_y ? -1 : 1);
+				
+			int texture;
+			C2D_SpriteSheet *sheet = get_sprite_sheet(c->texture, &texture);
 
 			spawn_sprite_c2d(
 				&rs,
 				sheet,
-				c->texture,
+				texture,
 				floorf(c_x),
 				floorf(c_y),
 				c->scale_x * c_flip_x_mult * scale * flip_x_mult,
@@ -136,6 +166,9 @@ void spawn_object_at(
 			viewable_objects[sprite_count].spr = rs;
 			viewable_objects[sprite_count].obj = obj_game;
 			viewable_objects[sprite_count].layer = i + 1;
+			viewable_objects[sprite_count].col_type = c->color_type;
+			viewable_objects[sprite_count].opacity = c->opacity;
+			viewable_objects[sprite_count].col_channel = get_color_channel(c->color_type, obj_game, obj);
 			viewable_objects_ptr[sprite_count] = &viewable_objects[sprite_count];
 			sprite_count++;
 		}
@@ -148,18 +181,31 @@ static inline uint32_t make_sort_key(const SpriteObject *s)
     const GameObject *game_obj = &game_objects[obj->id];
 
     int zlayer = obj->zlayer ? obj->zlayer : game_obj->z_layer;
-    int zorder = obj->zorder ? obj->zorder : game_obj->z_order;
+
+	// Blending makes zlayer one 
+	int col_channel = obj->col_channel;
+	if (col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0))) {
+		zlayer--;
+	}
 
     int child_z = 0;
+	int tex = game_obj->texture;
     if (s->layer > 0) {
         child_z = game_obj->children[s->layer - 1].z;
+        tex = game_obj->children[s->layer - 1].texture;
     }
 
-    uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 4 bits
+	int sheet = tex < SPRITESHEET2_START ? 1 : 0;
+
+    int zorder = obj->zorder ? obj->zorder : game_obj->z_order;
+
+
+    uint32_t zl = (uint32_t)(zlayer + 8);     // fits in 7 bits
+    uint32_t zs = (uint32_t)(sheet);          // fits in 1 bit
     uint32_t zo = (uint32_t)(zorder + 128);   // fits in 8 bits
     uint32_t cz = (uint32_t)(child_z + 128);  // fits in 8 bits
 
-    return (zl << 16) | (zo << 8) | cz;
+    return (zl << 17) | (zs << 16) | (zo << 8) | cz;
 }
 
 #define VIEW_OBJECTS (12 * 6)
@@ -244,7 +290,6 @@ void draw_objects() {
 			spawn_object_at(
 				obj,
 				obj->id,
-				spriteSheet,
 				calc_x,
 				calc_y,
 				obj->rotation,
@@ -258,8 +303,46 @@ void draw_objects() {
     // Sort
     sort_viewable_objects(viewable_objects_ptr, sprite_count);
 
+	int blend_enabled = false;
+
 	// Draw
+	C2D_ImageTint tint = { 0 };
 	for (size_t s = 0; s < sprite_count; s++) {
-		C2D_DrawSprite(&viewable_objects_ptr[s]->spr);
+		SpriteObject *obj = viewable_objects_ptr[s];
+		
+		int col_channel = obj->col_channel;
+
+		ColorChannel col;
+
+		if (col_channel < 0) {
+			col.color.r = 255;
+			col.color.g = 255;
+			col.color.b = 255;
+			col.blending = false;
+		} else {
+			col = channels[col_channel];
+		}
+
+		if (col.blending && !blend_enabled) {
+			C2D_Flush();
+			C3D_AlphaBlend(
+				GPU_BLEND_ADD, GPU_BLEND_ADD,
+				GPU_SRC_ALPHA, GPU_ONE,
+				GPU_ONE, GPU_ZERO
+			);
+			C2D_Prepare();
+			blend_enabled = true;
+		} else if (!col.blending && blend_enabled) {
+			C2D_Flush();
+			C3D_AlphaBlend(
+				GPU_BLEND_ADD, GPU_BLEND_ADD, 
+				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, 
+				GPU_ONE, GPU_ZERO);
+			C2D_Prepare();
+			blend_enabled = false;
+		}
+		
+		C2D_PlainImageTint(&tint, C2D_Color32(col.color.r, col.color.g, col.color.b, 255 * obj->opacity), 1.f);
+		C2D_DrawSpriteTinted(&viewable_objects_ptr[s]->spr, &tint);
 	}
 }

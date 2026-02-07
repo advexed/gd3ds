@@ -17,6 +17,9 @@ typedef struct
 	C2D_Sprite spr;
 	Object *obj;
 	int layer;
+	int col_type;
+	float opacity;
+	int col_channel;
 } SpriteObject;
 
 typedef struct {
@@ -26,6 +29,7 @@ typedef struct {
 
 extern int sprite_count;
 extern C2D_SpriteSheet spriteSheet;
+extern C2D_SpriteSheet spriteSheet2;
 extern C2D_SpriteSheet bgSheet;
 extern C2D_Sprite bg;
 

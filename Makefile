@@ -21,7 +21,7 @@ IP3DS := 192.168.1.142
 #---------------------------------------------------------------------------------
 BUILD := build
 OUTPUT := output
-SOURCES := source
+SOURCES := source libraries
 DATA := data
 INCLUDES := $(SOURCES) include
 ROMFS := romfs
@@ -72,7 +72,7 @@ CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.cpp)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.s)))
 PICAFILES := $(foreach dir,$(SOURCES),$(notdir $(call recurse,f,$(dir),*.pica)))
 SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
-GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.t3s)))
+GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(call recurse,f,$(dir),*.t3s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 export T3XFILES		:=	$(addprefix $(GFXBUILD)/,$(GFXFILES:.t3s=.t3x))

@@ -10,6 +10,7 @@
 #include "level_loading.h"
 #include "main.h"
 #include "graphics.h"
+#include "color_channels.h"
 
 float cam_x = 0;
 float cam_y = 0;
@@ -34,6 +35,9 @@ int main(int argc, char* argv[]) {
 	// Load graphics
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
+	
+	spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
+	if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
 
 	// BG
 	C2D_SpriteFromSheet(&bg, bgSheet, 0);
@@ -42,8 +46,6 @@ int main(int argc, char* argv[]) {
 
 	C2D_ImageTint tint = { 0 };
 	C2D_SetTintMode(C2D_TintMult);
-
-	C2D_PlainImageTint(&tint, C2D_Color32(40, 125, 255, 255), 1.f);
 
 	int returned = load_level("romfs:/TheoryofEverything2.gmd");
 	if (!returned) printf("\x1b[9;1HFailed");
@@ -77,6 +79,8 @@ int main(int argc, char* argv[]) {
 			cam_x -= CAM_SPEED;
 		}
 		
+		calculate_lbg();
+		
 		printf("\x1b[1;1HSpriteCount: %d\x1b[K", sprite_count);
 		printf("\x1b[2;1HCPU:        %6.2f%%\x1b[K", C3D_GetProcessingTime()*6.0f);
 		printf("\x1b[3;1HGPU:        %6.2f%%\x1b[K", C3D_GetDrawingTime()*6.0f);
@@ -86,8 +90,15 @@ int main(int argc, char* argv[]) {
 
 		// Render the scene
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_RenderTargetClear(top, C3D_CLEAR_ALL, 0, 0);
+		C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ZERO);
 		C2D_SceneBegin(top);
+
+		
+		Color col = channels[CHANNEL_BG].color;
+		C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 		C2D_DrawSpriteTinted(&bg, &tint);
+		
 		
 		C2D_ViewScale(SCALE, SCALE);
 		draw_objects();

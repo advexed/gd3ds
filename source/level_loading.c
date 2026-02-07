@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include "color_channels.h"
+#include "objects.h"
 
 Object *objectArray = NULL;
 
@@ -377,9 +379,9 @@ GDValueType get_value_type_for_key(int key) {
 //        case 15: return GD_VAL_BOOL;   // (Color trigger) Player 1 color
 //        case 16: return GD_VAL_BOOL;   // (Color trigger) Player 2 color
 //        case 17: return GD_VAL_BOOL;   // (Color trigger) Blending
-//        case 19: return GD_VAL_INT;    // 1.9 color channel
-//        case 21: return GD_VAL_INT;    // Main col channel
-//        case 22: return GD_VAL_INT;    // Detail col channel
+        case 19: return GD_VAL_INT;    // 1.9 color channel
+        case 21: return GD_VAL_INT;    // Main col channel
+        case 22: return GD_VAL_INT;    // Detail col channel
 //        case 23: return GD_VAL_INT;    // (Color trigger) Target color ID
         case 24: return GD_VAL_INT;    // Zlayer
         case 25: return GD_VAL_INT;    // Zorder
@@ -421,36 +423,6 @@ GDValueType get_value_type_for_key(int key) {
 }
 
 void fill_object_data(Object *object, int key, GDValueType type, GDValue val) {
-  // *soa_id(object) = obj->values[0].i;
-  // *soa_type(object) = obtain_type_from_id(*soa_id(object));
-  // 
-  // // Temporarily convert user coins (added in 2.0) into secret coins
-  // *soa_id(object) = convert_object(*soa_id(object));
-  // object->scale_x = 1.f;
-  // object->scale_y = 1.f;
-  // 
-  // if (*soa_type(object) == TYPE_NORMAL_OBJECT) {
-  //     // Set to default colors
-  //     object->object.main_col_channel = 0;
-  //     object->object.detail_col_channel = 0;
-  //     object->object.u1p9_col_channel = 0;
-  //     
-  //     object->object.zsheetlayer = objects[*soa_id(object)].spritesheet_layer;
-  //     object->object.zlayer = objects[*soa_id(object)].def_zlayer;
-  //     object->object.zorder = objects[*soa_id(object)].def_zorder;
-  // } else if (*soa_type(object) == TYPE_COL_TRIGGER) {
-  //     object->trigger.col_trigger.opacity = 1.f;
-  // }
-
-  // object->opacity = 1.f;
-
-  // if (is_object_unimplemented(*soa_id(object))) {
-  //     output_log("Found unimplemented object with id %d\n", *soa_id(object));
-  // }
-
-    // Get a random value for this object
-   // object->random = rand();
-
     // Default members
     switch (key) {
         case 1:  // ID
@@ -470,6 +442,15 @@ void fill_object_data(Object *object, int key, GDValueType type, GDValue val) {
             break;
         case 6:  // Rotation
             if (type == GD_VAL_FLOAT) object->rotation = val.f;
+            break;
+        case 19: // 1.9 channel id
+            if (type == GD_VAL_INT) object->detail_col_channel = convert_one_point_nine_channel(val.i);
+            break;
+        case 21: // Main col channel
+            if (type == GD_VAL_INT) object->col_channel = val.i;
+            break;
+        case 22: // Detail col channel
+            if (type == GD_VAL_INT) object->detail_col_channel = val.i;
             break;
         case 24: // Z layer
             if (type == GD_VAL_INT) object->zlayer = val.i;
@@ -499,9 +480,6 @@ void fill_object_data(Object *object, int key, GDValueType type, GDValue val) {
 //        // Col trigger members
 //        if (*soa_type(object) == TYPE_NORMAL_OBJECT) {
 //            switch (key) {
-//                case 19: // 1.9 channel id
-//                    if (type == GD_VAL_INT) object->object.u1p9_col_channel = convert_1p9_channel(val.i);
-//                    break;
 //                case 21: // Main col channel
 //                    if (type == GD_VAL_INT) object->object.main_col_channel = val.i;
 //                    break;
@@ -722,6 +700,24 @@ void fill_object_data(Object *object, int key, GDValueType type, GDValue val) {
 //    return object;
 }
 
+bool obj_has_main(const GameObject *obj) {
+    if (obj->color_type == COLOR_TYPE_BASE) return true;
+    
+    for (int i = 0; i < obj->child_count; i++) {
+        if (obj->children[i].color_type == COLOR_TYPE_BASE) return true;
+    }
+    return false;
+}
+
+bool obj_has_detail(const GameObject *obj) {
+    if (obj->color_type == COLOR_TYPE_DETAIL) return true;
+    
+    for (int i = 0; i < obj->child_count; i++) {
+        if (obj->children[i].color_type == COLOR_TYPE_DETAIL) return true;
+    }
+    return false;
+}
+
 int parse_gd_object(const char *objStr, Object *obj) {
     int count = 0;
     // Split object into each key
@@ -754,6 +750,17 @@ int parse_gd_object(const char *objStr, Object *obj) {
             default:
                 break;
         }
+    }
+    
+    const GameObject *game_object = &game_objects[obj->id];
+
+    if (!obj_has_main(game_object) && obj_has_detail(game_object) && !obj->col_channel) {
+        obj->col_channel = game_object->base_color;
+    } else if (game_object->swap_base_detail) {
+        if (!obj->detail_col_channel) obj->detail_col_channel = game_object->base_color;
+    } else {
+        if (!obj->col_channel) obj->col_channel = game_object->base_color;
+        if (!obj->detail_col_channel) obj->detail_col_channel = 1;
     }
 
     free_string_array(tokens, count);
@@ -816,6 +823,9 @@ int load_level(char *path) {
         if (!objectArray) return 0;
     }
     free(level);
+
+    init_col_channels();
+
     return 1;
 }
 
