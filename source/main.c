@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	C2D_ImageTint tint = { 0 };
 	C2D_SetTintMode(C2D_TintMult);
 
-	int returned = load_level("romfs:/TheoryofEverything2.gmd");
+	int returned = load_level("romfs:/Retray.gmd");
 	if (returned) printf("\x1b[9;1HFailed %d", returned);
 
 	printf("\x1b[8;1HUse dpad to move camera");
