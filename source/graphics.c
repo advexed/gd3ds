@@ -577,6 +577,17 @@ void draw_objects() {
 			float fade_scale = 1.f;
 
 			get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
+			
+			// Handle special fade types
+			if (obj->transition_applied == FADE_DOWN_STATIONARY || obj->transition_applied == FADE_UP_STATIONARY) {
+				if (fade_val < 255) {
+					if (calc_x > (SCREEN_WIDTH / SCALE) / 2) {
+						calc_x = SCREEN_WIDTH / SCALE - FADE_WIDTH;
+					} else {
+						calc_x = FADE_WIDTH;
+					}
+				}
+			}
 
 			spawn_object_at(
 				obj,
@@ -637,17 +648,6 @@ void draw_objects() {
 		if (object_fades(game_object)) {
 			opacity *= get_fading_obj_fade(game_object, x, SCREEN_WIDTH / SCALE);
 		}
-
-		// Handle special fade types
-        if (game_object->transition_applied == FADE_DOWN_STATIONARY || game_object->transition_applied == FADE_UP_STATIONARY) {
-            if (opacity < 255) {
-                if (x > (SCREEN_WIDTH / SCALE) / 2) {
-                    obj->spr.params.pos.x = SCREEN_WIDTH / SCALE - FADE_WIDTH;
-                } else {
-                    obj->spr.params.pos.x = FADE_WIDTH;
-                }
-            }
-        }
 
 		C2D_SpriteMove(&obj->spr, fade_x, fade_y);
 		
