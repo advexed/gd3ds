@@ -13,8 +13,17 @@
 #include "color_channels.h"
 #include "mp3_player.h"
 
+#define CITRA_TYPE 0x20000
+#define CITRA_VERSION 11
+
 float cam_x = 0;
 float cam_y = 0;
+
+bool is_citra() {
+	s64 version = 0;
+	svcGetSystemInfo(&version, CITRA_TYPE, CITRA_VERSION);
+	return version != 0;
+}
 
 void no_dsp_firmware(void) {
 	consoleInit(GFX_TOP, NULL);
@@ -53,12 +62,14 @@ int main(int argc, char* argv[]) {
 		no_dsp_firmware();
 	}
 
+	u8 isNot2DS;
+	CFGU_GetModelNintendo2DS(&isNot2DS);
+	if (!isNot2DS && !is_citra()) gfxSetWide(true);
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(MAX_SPRITES);
 	C2D_Prepare();
 	consoleInit(GFX_BOTTOM, NULL);
 	osSetSpeedupEnable(1);
-	
 
 	// Create screens
 	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
