@@ -37,6 +37,7 @@ void ui_image_set_tint(UIElement* e, u32 color) {
 
 void ui_image_clear_tint(UIElement* e) {
     if (e->type != UI_IMAGE) return;
+    
     e->image.useTint = false;
 }
 
@@ -54,7 +55,7 @@ UIElement ui_create_image(int x, int y, int sprite_index, float sx, float sy, ch
 
     // Copy tag
     strncpy(e.tag, tag, 15);
-    
+
     e.w = e.image.sprite.params.pos.w * sx;
     e.h = e.image.sprite.params.pos.h * sy;
 

@@ -14,11 +14,12 @@ static void set_checkbox_texture(UIElement* e, bool enabled) {
 
 // Set checkbox checked state
 void set_checkbox_enabled(UIElement *e, bool enabled) {
-    if (e->type == UI_CHECKBOX) {
-        set_checkbox_texture(e, enabled);
-        e->checkbox.checked = enabled;
-    }
+    if (e->type != UI_CHECKBOX) return;
+
+    set_checkbox_texture(e, enabled);
+    e->checkbox.checked = enabled;
 }
+
 
 static void ui_checkbox_update(UIElement* e, touchPosition* touch) {
     if (!e->enabled || !e->visible) return;
