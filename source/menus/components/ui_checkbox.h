@@ -7,3 +7,4 @@ UIElement ui_create_checkbox(
     void *action_data,
     char *tag
 );
+void set_checkbox_enabled(UIElement *e, bool enabled);

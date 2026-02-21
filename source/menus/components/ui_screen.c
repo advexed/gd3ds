@@ -12,16 +12,19 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+// Update all screen characters
 void ui_screen_update(UIScreen* s, touchPosition* touch) {
     for (int i = 0; i < s->count; i++)
         s->elements[i].update(&s->elements[i], touch);
 }
 
+// Draw all screen characters
 void ui_screen_draw(UIScreen* s) {
     for (int i = 0; i < s->count; i++)
         s->elements[i].draw(&s->elements[i]);
 }
 
+// Find an action by its name
 UIActionFn ui_find_action(const UIAction* actions, size_t count, const char* name) {
     for (size_t i = 0; i < count; i++)
         if (strcmp(actions[i].name, name) == 0)
@@ -29,23 +32,26 @@ UIActionFn ui_find_action(const UIAction* actions, size_t count, const char* nam
     return NULL;
 }
 
+// This gets a line and converts it into a null terminated string
 static void trim_newline(char* s) {
     size_t len = strlen(s);
     if (len > 0 && s[len - 1] == '\n')
         s[len - 1] = '\0';
 }
 
-
+// This strips a string surrounded by quotes and removes those
 static void strip_quotes(char* s) {
     size_t len = strlen(s);
+    // Check if first char and last char is "
     if (len >= 2 && s[0] == '"' && s[len - 1] == '"') {
+        // Get all but "
         memmove(s, s + 1, len - 1);
         s[len - 2] = '\0';
     }
 }
 
-static char* next_token(char** cursor)
-{
+// Searches for the next token
+static char* next_token(char** cursor) {
     if (!*cursor) return NULL;
 
     char* s = *cursor;
@@ -53,24 +59,28 @@ static char* next_token(char** cursor)
     // Skip leading spaces
     while (*s == ' ') s++;
 
+    // If empty string, exit
     if (*s == '\0') {
         *cursor = NULL;
         return NULL;
     }
 
     char* start = s;
-    int inQuotes = 0;
+    bool inQuotes = false;
 
+    // Search for quotes
     while (*s) {
         if (*s == '"') {
             inQuotes = !inQuotes;
         }
+        // If not in quotes and found delimiter, no more iterating
         else if ((*s == ' ' || *s == '\n' || *s == '\r') && !inQuotes) {
             break;
         }
         s++;
     }
 
+    // Set null character
     if (*s) {
         *s = '\0';
         *cursor = s + 1;
@@ -81,24 +91,28 @@ static char* next_token(char** cursor)
     return start;
 }
 
+// Only checks for the first character
 static bool get_bool(char *value) {
     return *value == 't' || *value == 'T';
 }
 
+// Get element by its tag, returns NULL if there is no elements with that tag
 UIElement *get_element_by_tag(UIScreen *screen, const char *tag) {
     for (int i = 0; i < screen->count; i++) {
+        // Check for element with this tag
         if (strcmp(screen->elements[i].tag, tag) == 0) {
             return &screen->elements[i];
         }
     }
+    // No element found
     return NULL;
 }
 
+// Load an screen from its file, needs a pointer to the actions table and the action count
 void ui_load_screen(UIScreen* screen,
                     const UIAction* actions,
                     size_t actionCount,
-                    const char* path)
-{
+                    const char* path) {
     FILE* f = fopen(path, "r");
     if (!f) return;
 
@@ -106,41 +120,48 @@ void ui_load_screen(UIScreen* screen,
 
     char line[512];
 
+    // Iterate through lines (one element per line)
     while (fgets(line, sizeof(line), f)) {
 
         trim_newline(line);
 
+        // Comment or empty
         if (line[0] == '#' || line[0] == '\0')
             continue;
         
         char* cursor = line;
         char* token = next_token(&cursor);
+
+        // Check for invalid tokens
         if (!token) continue;
 
+        // The element type
         char type[16];
         strncpy(type, token, 15);
 
-        // Defaults (optional values)
+        // Default values
         int x = 0, y = 0, id = 0;
         float sx = 1.0f, sy = 1.0f, scale = 1.0f;
-        char actionName[64] = {0};
         float align = 0.f;
         bool checked = false;
 
+        // Some strings
+        char actionName[64] = {0};
         char text[256] = {0};
         char tag[16] = {0};
 
-        // Parse key=value pairs
+        // Parse element parameters
         while ((token = next_token(&cursor)) != NULL) {
             char* equal = strchr(token, '=');
             if (!equal) continue;
 
+            // This replaces the equal sign between key and value with a null character, dividing the string in two
             *equal = '\0';
 
             char* key = token;
             char* value = equal + 1;
 
-            // Parameters
+            // Parameters, this might be made better
             if (strcmp(key, "x") == 0)
                 x = atoi(value);
             else if (strcmp(key, "y") == 0)
@@ -177,9 +198,11 @@ void ui_load_screen(UIScreen* screen,
             }
         }
 
+        // There is a limit of elements on an screen, exit if reached
         if (screen->count >= UI_MAX_ELEMENTS)
             break;
 
+        // Elements
         if (strcmp(type, "button") == 0) {
             screen->elements[screen->count++] =
                 ui_create_button(

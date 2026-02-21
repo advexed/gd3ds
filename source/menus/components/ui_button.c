@@ -52,14 +52,17 @@ static void ui_button_draw(UIElement* e) {
     C2D_SpriteSetScale(&e->button.image.sprite, scale, scale);
     C2D_DrawSprite(&e->button.image.sprite);
 
+    // Get text length in pixels
     float length = get_text_length(bigFont_fontCharset, 1 / 0.85f, "%s", e->button.text);
 
+    // Resize it to fit the button bounds
     float txt_scale;
     if (e->w < length) {
         txt_scale = scale * (e->w / length);
     } else {
         txt_scale = scale * 0.85f;
     }
+
     draw_text(bigFont_fontCharset, bigFont_sheet, e->x, e->y, txt_scale, 0.5f, "%s", e->button.text);
 }
 
@@ -84,6 +87,7 @@ UIElement ui_create_button(
 
     // Copy tag
     strncpy(e.tag, tag, 15);
+    
     // Copy text
     strncpy(e.button.text, text, 63);
 
