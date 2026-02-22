@@ -10,5 +10,5 @@ UIElement ui_create_button(
     UIActionFn action,
     void *action_data,
     char *text,
-    char *tag
+    char (*tag)[TAG_LENGTH]
 );

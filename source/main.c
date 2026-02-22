@@ -69,6 +69,8 @@ int main(int argc, char* argv[]) {
 	C2D_Prepare();
 	osSetSpeedupEnable(1);
 	
+	C2D_SetTintMode(C2D_TintMult);
+	
 	if(ndspInit()) {
 		no_dsp_firmware();
 	}
@@ -101,8 +103,6 @@ int main(int argc, char* argv[]) {
 	
 	spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
 	if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
-
-	C2D_SetTintMode(C2D_TintMult);
 
 	int returned = load_level("romfs:/Electroman.gmd");
 	if (returned) printf("\x1b[9;1HFailed %d", returned);

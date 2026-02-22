@@ -6,18 +6,17 @@
 #include "ui_button.h"
 #include "easing.h"
 #include "math_helpers.h"
+#include "ui_screen.h"
 
-static void ui_button_update(UIElement* e, touchPosition* touch) {
-    if (!e->enabled || !e->visible) return;
-
+static void ui_button_update(UIElement* e, UIInput* touch) {
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
     bool releasedTouch = hidKeysUp() & KEY_TOUCH;
 
-    bool inside = touch->px >= e->x - (e->w / 2) && touch->px < e->x + (e->w / 2) &&
-                  touch->py >= e->y - (e->h / 2) && touch->py < e->y + (e->h / 2);
+    bool inside = touch->touchPosition.px >= e->x - (e->w / 2) && touch->touchPosition.px < e->x + (e->w / 2) &&
+                  touch->touchPosition.py >= e->y - (e->h / 2) && touch->touchPosition.py < e->y + (e->h / 2);
 
     // Check if pressed the button
-    if (inside && pressedTouch) {
+    if (inside && pressedTouch && !touch->did_something) {
         e->button.hovered = true;
     }
     
@@ -46,11 +45,12 @@ static void ui_button_update(UIElement* e, touchPosition* touch) {
     if (!inside) {
         e->button.hovered = false;
     }
+    
+    // Mask background elements
+    if (inside) touch->did_something = true;
 }
 
 static void ui_button_draw(UIElement* e) {
-    if (!e->visible) return;
-
     float scale = e->button.hoverScale;
 
     C2D_SpriteSetCenter(&e->button.image.sprite, 0.5f, 0.5f);
@@ -77,13 +77,12 @@ UIElement ui_create_button(
     UIActionFn action,
     void *action_data,
     char *text,
-    char *tag
+    char (*tag)[TAG_LENGTH]
 ) {
     UIElement e = {
         .type = UI_BUTTON,
         .x = x, .y = y,
         .w = 0, .h = 0,
-        .visible = true,
         .enabled = true,
         .action = action,
         .action_data = action_data,
@@ -92,13 +91,14 @@ UIElement ui_create_button(
     };
 
     // Copy tag
-    strncpy(e.tag, tag, 15);
+    copy_tag_array(&e, tag);
 
     // Copy text
     strncpy(e.button.text, text, 63);
 
     C2D_SpriteFromSheet(&e.button.image.sprite, ui_sheet, sprite_index);
-
+    
+    e.button.hoverScale = 1.f;
     e.w = e.button.image.sprite.params.pos.w;
     e.h = e.button.image.sprite.params.pos.h;
 

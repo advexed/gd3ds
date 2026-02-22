@@ -3,11 +3,15 @@
 #include <3ds.h>
 #include <citro2d.h>
 
+#define TAGS_PER_ELEMENT 5
+#define TAG_LENGTH 16
+
 typedef enum {
     UI_BUTTON,
     UI_IMAGE,
     UI_LABEL,
-    UI_CHECKBOX
+    UI_CHECKBOX,
+    UI_WINDOW
 } UIElementType;
 
 typedef struct {
@@ -43,10 +47,21 @@ typedef struct {
 } UICheckBoxData;
 
 typedef struct {
+    C2D_Image atlas;
+
+    int border;
+} UIWindowData;
+
+typedef struct {
     char text[256];
     float alignment;
     float scale;
 } UILabelData;
+
+typedef struct {
+    touchPosition touchPosition;
+    bool did_something;
+} UIInput;
 
 typedef struct UIElement UIElement;
 
@@ -58,7 +73,6 @@ struct UIElement {
     int x, y;
     int w, h;
 
-    bool visible;
     bool enabled;
 
     UIActionFn action;
@@ -69,10 +83,11 @@ struct UIElement {
         UIButtonData button;
         UILabelData label;
         UICheckBoxData checkbox;
+        UIWindowData window;
     };
 
-    char tag[16];
+    char tag[TAGS_PER_ELEMENT][TAG_LENGTH];
 
-    void (*update)(UIElement*, touchPosition*);
+    void (*update)(UIElement*, UIInput*);
     void (*draw)(UIElement*);
 };

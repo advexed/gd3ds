@@ -5,6 +5,7 @@
 #include "ui_label.h"
 #include "ui_screen.h"
 #include "ui_checkbox.h"
+#include "ui_window.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,15 +14,19 @@
 #include <citro2d.h>
 
 // Update all screen characters
-void ui_screen_update(UIScreen* s, touchPosition* touch) {
-    for (int i = 0; i < s->count; i++)
-        s->elements[i].update(&s->elements[i], touch);
+void ui_screen_update(UIScreen* s, UIInput* touch) {
+    for (int i = s->count - 1; i >= 0; i--) {
+        UIElement *e = &s->elements[i];
+        if (e->enabled) e->update(e, touch);
+    }
 }
 
 // Draw all screen characters
 void ui_screen_draw(UIScreen* s) {
-    for (int i = 0; i < s->count; i++)
-        s->elements[i].draw(&s->elements[i]);
+    for (int i = 0; i < s->count; i++) {
+        UIElement *e = &s->elements[i];
+        if (e->enabled) e->draw(e);
+    }
 }
 
 // Find an action by its name
@@ -97,15 +102,68 @@ static bool get_bool(char *value) {
 }
 
 // Get element by its tag, returns NULL if there is no elements with that tag
-UIElement *get_element_by_tag(UIScreen *screen, const char *tag) {
+UIElement *ui_get_element_by_tag(UIScreen *screen, const char *tag) {
     for (int i = 0; i < screen->count; i++) {
-        // Check for element with this tag
-        if (strcmp(screen->elements[i].tag, tag) == 0) {
-            return &screen->elements[i];
+        for (int j = 0; j < TAGS_PER_ELEMENT; j++) {
+            // Check for element with this tag
+            if (strcmp(screen->elements[i].tag[j], tag) == 0) {
+                return &screen->elements[i];
+            }
         }
     }
     // No element found
     return NULL;
+}
+
+// Run a function on each element with an specific tag
+void ui_run_func_on_tag(UIScreen *screen, const char *tag, void (*func)(UIElement *e)) {
+    for (int i = 0; i < screen->count; i++) {
+        for (int j = 0; j < TAGS_PER_ELEMENT; j++) {
+            // Check for element with this tag
+            if (strcmp(screen->elements[i].tag[j], tag) == 0) {
+                func(&screen->elements[i]);
+            }
+        }
+    }
+}
+
+void ui_enable_element(UIElement *e) { 
+	e->enabled = true;
+};
+
+void ui_disable_element(UIElement *e) { 
+	e->enabled = false;
+	if (e->type == UI_BUTTON) {
+        e->button.hovered = false;
+        e->button.hoverScale = 1.f;
+        e->button.hoverTimer = 0.f;
+    }
+
+    if (e->type == UI_CHECKBOX) {
+        e->checkbox.hovered = false;
+        e->checkbox.hoverScale = 1.f;
+        e->checkbox.hoverTimer = 0.f;
+    }
+};
+
+void copy_tag_array(UIElement *e, char (*tag)[TAG_LENGTH]) {
+    for (int i = 0; i < TAGS_PER_ELEMENT; i++) {
+        strncpy(e->tag[i], tag[i], TAG_LENGTH - 1);
+    }
+}
+
+static void split_tags(char *input, char tag[][TAG_LENGTH]) {
+    int i = 0;
+    char *token = strtok(input, ",");
+
+    while (token != NULL && i < TAGS_PER_ELEMENT)
+    {
+        strncpy(tag[i], token, TAG_LENGTH - 1);
+        tag[i][TAG_LENGTH - 1] = '\0';   // ensure null termination
+        i++;
+
+        token = strtok(NULL, ",");
+    }
 }
 
 // Load an screen from its file, needs a pointer to the actions table and the action count
@@ -144,11 +202,13 @@ void ui_load_screen(UIScreen* screen,
         float sx = 1.0f, sy = 1.0f, scale = 1.0f;
         float align = 0.f;
         bool checked = false;
+        int style = 0;
+        int w = 0, h = 0;
 
         // Some strings
         char actionName[64] = {0};
         char text[256] = {0};
-        char tag[16] = {0};
+        char tag[TAGS_PER_ELEMENT][TAG_LENGTH] = {0};
 
         // Parse element parameters
         while ((token = next_token(&cursor)) != NULL) {
@@ -166,12 +226,19 @@ void ui_load_screen(UIScreen* screen,
                 x = atoi(value);
             else if (strcmp(key, "y") == 0)
                 y = atoi(value);
+            else if (strcmp(key, "w") == 0)
+                w = atoi(value);
+            else if (strcmp(key, "h") == 0)
+                h = atoi(value);
             else if (strcmp(key, "id") == 0)
                 id = atoi(value);
+            else if (strcmp(key, "style") == 0)
+                style = atoi(value);
             else if (strcmp(key, "sx") == 0)
                 sx = atof(value);
             else if (strcmp(key, "sy") == 0)
                 sy = atof(value);
+                
             else if (strcmp(key, "scale") == 0)
                 scale = atof(value);
             else if (strcmp(key, "action") == 0) {
@@ -192,7 +259,7 @@ void ui_load_screen(UIScreen* screen,
                 } 
             } else if (strcmp(key, "tag") == 0) {
                 strip_quotes(value);
-                strncpy(tag, value, 15);
+                split_tags(value, tag);
             } else if (strcmp(key, "checked") == 0) {
                 checked = get_bool(value);
             }
@@ -224,6 +291,12 @@ void ui_load_screen(UIScreen* screen,
                     x, y, checked,
                     ui_find_action(actions, actionCount, actionName),
                     NULL,
+                    tag
+                );
+        } else if (strcmp(type, "window") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_window(
+                    x, y, w, h, style,
                     tag
                 );
         }

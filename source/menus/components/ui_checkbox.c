@@ -6,6 +6,7 @@
 #include "easing.h"
 #include "math_helpers.h"
 #include "ui_checkbox.h"
+#include "ui_screen.h"
 
 static void set_checkbox_texture(UIElement* e, bool enabled) {
     int tex = enabled ? 28 : 27;
@@ -24,17 +25,15 @@ void set_checkbox_enabled(UIElement *e, bool enabled) {
 }
 
 
-static void ui_checkbox_update(UIElement* e, touchPosition* touch) {
-    if (!e->enabled || !e->visible) return;
-
+static void ui_checkbox_update(UIElement* e, UIInput* touch) {
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
     bool releasedTouch = hidKeysUp() & KEY_TOUCH;
 
-    bool inside = touch->px >= e->x - (e->w / 2) && touch->px < e->x + (e->w / 2) &&
-                  touch->py >= e->y - (e->h / 2) && touch->py < e->y + (e->h / 2);
+    bool inside = touch->touchPosition.px >= e->x - (e->w / 2) && touch->touchPosition.px < e->x + (e->w / 2) &&
+                  touch->touchPosition.py >= e->y - (e->h / 2) && touch->touchPosition.py < e->y + (e->h / 2);
 
     // Check if pressed the checkbox
-    if (inside && pressedTouch) {
+    if (inside && pressedTouch && !touch->did_something) {
         e->checkbox.hovered = true;
     }
     
@@ -65,11 +64,12 @@ static void ui_checkbox_update(UIElement* e, touchPosition* touch) {
     if (!inside) {
         e->checkbox.hovered = false;
     }
+                      
+    // Mask background elements
+    if (inside) touch->did_something = true;
 }
 
 static void ui_checkbox_draw(UIElement* e) {
-    if (!e->visible) return;
-
     float scale = e->checkbox.hoverScale;
 
     C2D_SpriteSetCenter(&e->checkbox.image.sprite, 0.5f, 0.5f);
@@ -82,13 +82,12 @@ UIElement ui_create_checkbox(
     int x, int y, bool enabled,
     UIActionFn action,
     void *action_data,
-    char *tag
+    char (*tag)[TAG_LENGTH]
 ) {
     UIElement e = {
         .type = UI_CHECKBOX,
         .x = x, .y = y,
         .w = 0, .h = 0,
-        .visible = true,
         .enabled = true,
         .action = action,
         .action_data = action_data,
@@ -97,7 +96,7 @@ UIElement ui_create_checkbox(
     };
 
     // Copy tag
-    strncpy(e.tag, tag, 15);
+    copy_tag_array(&e, tag);
 
     set_checkbox_texture(&e, enabled);
 
