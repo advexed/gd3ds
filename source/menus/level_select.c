@@ -37,7 +37,7 @@ UIElement *level_card_2_window = NULL;
 UIElement *level_card_2_title = NULL;
 UIElement *level_card_2_stars = NULL;
 
-#define ANIM_DURATION 0.5f
+#define ANIM_DURATION 0.8f
 
 #define C2D_Color32Const(r, g, b, a) (r | (g << (u32)8) | (b << (u32)16) | (a << (u32)24))
 
@@ -121,7 +121,7 @@ void handle_card_movement() {
 			return;
 		}
 
-		float fade_value = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.8f);
+		float fade_value = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.6f);
 		float value = 160 + (fade_value) * scroll_dir;
 		anim_time += 0.016666f;
 
