@@ -37,9 +37,6 @@ UIElement *level_card_2_window = NULL;
 UIElement *level_card_2_title = NULL;
 UIElement *level_card_2_stars = NULL;
 
-float old_offset = 0;
-float new_offset = 0;
-
 #define ANIM_DURATION 0.5f
 
 #define C2D_Color32Const(r, g, b, a) (r | (g << (u32)8) | (b << (u32)16) | (a << (u32)24))
@@ -58,8 +55,8 @@ const u32 default_lvl_colors[] = {
     C2D_Color32Const(0, 112, 229, 255),
 };
 
-void update_level_name(int card);
-void update_level_stars(int card);
+void update_level_name(int level, int card);
+void update_level_stars(int level, int card);
 
 void disable_card_2(UIElement *e) {
 	e->enabled = false;
@@ -77,9 +74,12 @@ void level_card_move_left(UIElement *e) {
 	e->x -= 320;
 }
 
-void update_level_name(int card) {
+void update_level_name(int level, int card) {
+	if (level < 0) level = MAIN_LEVELS_NUM-1;
+	if (level >= MAIN_LEVELS_NUM) level = 0;
+
 	UIElement *e = (card) ? level_card_2_title : level_card_title;
-    float length = get_text_length(bigFont_fontCharset, 1 / 0.85f, main_levels[curr_level_id].level_name);
+    float length = get_text_length(bigFont_fontCharset, 1 / 0.85f, main_levels[level].level_name);
 
     float txt_scale;
     if (level_card_window->w < length) {
@@ -90,13 +90,16 @@ void update_level_name(int card) {
 
 	e->label.scale = txt_scale;
 
-	strncpy(e->label.text, main_levels[curr_level_id].level_name, 255);
+	strncpy(e->label.text, main_levels[level].level_name, 255);
 }
 
-void update_level_stars(int card) {
+void update_level_stars(int level, int card) {
+	if (level < 0) level = MAIN_LEVELS_NUM-1;
+	if (level >= MAIN_LEVELS_NUM) level = 0;
+
 	UIElement *e = (card) ? level_card_2_stars : level_card_stars;
 	char stars[10] = { 0 };
-	snprintf(stars, 9, "%d", main_levels[curr_level_id].stars);
+	snprintf(stars, 9, "%d", main_levels[level].stars);
 	strncpy(e->label.text, stars, 255);
 }
 
@@ -108,63 +111,65 @@ void action_open_level(void* data) {
 void handle_card_movement() {
 	if (scroll_dir != 0) {
 		if (anim_time > ANIM_DURATION) {
-			update_level_name(0);
-			update_level_stars(0);
+			update_level_name(curr_level_id, 0);
+			update_level_stars(curr_level_id, 0);
 
 			ui_run_func_on_tag(&screen, "level_card_2", disable_card_2);
 			ui_set_pos_on_tag(&screen, 160, 90, "level_card");
 			ui_set_pos_on_tag(&screen, 160, 90, "level_card_2");
-			
 			scroll_dir = 0;
+			return;
 		}
-		new_offset = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.8f);
+
+		float fade_value = easeValue(ELASTIC_OUT, 0, 320, anim_time, ANIM_DURATION, 0.8f);
+		float value = 160 + (fade_value) * scroll_dir;
 		anim_time += 0.016666f;
-	}
-}
 
-
-void level_card_movement(UIElement *e) {
-	if (scroll_dir != 0) {
-		e->x += (new_offset - old_offset) * scroll_dir;
+		ui_set_pos_on_tag(&screen, value, 90, "level_card");
+		ui_set_pos_on_tag(&screen, value - 320 * scroll_dir, 90, "level_card_2");
 	}
 }
 
 void action_move_right(void* data) { 
-	if (scroll_dir) return;
 	curr_level_id++;
 	scroll_dir = -1;
 	scrolled = 0;
 	anim_time = 0;
-	old_offset = 0;
 	
 	if (curr_level_id >= MAIN_LEVELS_NUM) curr_level_id = 0;
 	
+	ui_set_pos_on_tag(&screen, 160, 90, "level_card");
 	ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 	ui_run_func_on_tag(&screen, "level_card_2", level_card_move_right);
 	
 	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_COLORS], ANIM_DURATION);
 
-	update_level_name(1);
-	update_level_stars(1);
+	update_level_name(curr_level_id - 1, 0);
+	update_level_stars(curr_level_id - 1, 0);
+
+	update_level_name(curr_level_id, 1);
+	update_level_stars(curr_level_id, 1);
 };
 
 void action_move_left(void* data) { 
-	if (scroll_dir) return;
 	curr_level_id--;
 	scroll_dir = 1;
 	scrolled = 0;
 	anim_time = 0;
-	old_offset = 0;
 
 	if (curr_level_id < 0) curr_level_id = MAIN_LEVELS_NUM-1;
 
+	ui_set_pos_on_tag(&screen, 160, 90, "level_card");
 	ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
 	ui_run_func_on_tag(&screen, "level_card_2", level_card_move_left);
 
 	upload_color_to_buffer(0, default_lvl_colors[curr_level_id % NUM_COLORS], ANIM_DURATION);
 
-	update_level_name(1);
-	update_level_stars(1);
+	update_level_name(curr_level_id + 1, 0);
+	update_level_stars(curr_level_id + 1, 0);
+
+	update_level_name(curr_level_id, 1);
+	update_level_stars(curr_level_id, 1);
 };
 
 UIAction actions[] = {
@@ -194,8 +199,8 @@ void level_select_loop() {
 	level_card_2_title = ui_get_element_by_tag(&screen, "level_title_2");
 	level_card_2_stars = ui_get_element_by_tag(&screen, "level_stars_2");
 
-	update_level_name(0);
-	update_level_stars(0);
+	update_level_name(curr_level_id, 0);
+	update_level_stars(curr_level_id, 0);
 	
 	ui_run_func_on_tag(&screen, "level_card_2", disable_card_2);
 
@@ -241,9 +246,6 @@ void level_select_loop() {
 		ui_image_set_tint(bg_gradient, C2D_Color32(channel.color.r, channel.color.g, channel.color.b, 255));
 
 		handle_card_movement();
-		ui_run_func_on_tag(&screen, "level_card", level_card_movement);
-		ui_run_func_on_tag(&screen, "level_card_2", level_card_movement);
-		old_offset = new_offset;
 
 		ui_screen_update(&screen, &touch);
 
