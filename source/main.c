@@ -13,6 +13,7 @@
 #include "color_channels.h"
 #include "mp3_player.h"
 #include "level/main_levels.h"
+#include "fonts/bigFont.h"
 
 #include "menus/level_select.h"
 #include "menus/components/ui_screen.h"
@@ -151,6 +152,10 @@ void game_loop() {
 
 			C2D_SceneBegin(bot);
 			C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+			
+			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6, 0.5f, 0, "CPU: %6.2f%%", C3D_GetProcessingTime() * 6.25f);
+			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, 0.5f, 0, "GPU: %6.2f%%", C3D_GetDrawingTime() * 6.25f);
+			draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, 0.5f, 0, "Usage: %6.2f%%", (C3D_GetProcessingTime() + C3D_GetDrawingTime()) * 6.25f);
 			draw_fade();
 			C3D_FrameEnd(0);
 		} while (handle_fading());
