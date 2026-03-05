@@ -10,9 +10,6 @@ jobs:
     container: devkitpro/devkitarm
     name: Compile ROM
     steps:
-      - name: Update dependencies
-        run: |
-          dkp-pacman -Syu --noconfirm 3ds-mpg123 3ds-zlib
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
