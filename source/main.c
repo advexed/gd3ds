@@ -15,6 +15,8 @@
 #include "level/main_levels.h"
 #include "fonts/bigFont.h"
 
+#include <curl/curl.h>
+
 #include "menus/level_select.h"
 #include "menus/components/ui_screen.h"
 
