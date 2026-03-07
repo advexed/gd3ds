@@ -172,7 +172,7 @@ void spawn_object_at(
         C2D_Sprite rs = { 0 };
 		
 		// Skip if no texture
-		if (obj->children->texture >= 0 && sprite_count < MAX_SPRITES - 1) {
+		if (c->texture >= 0 && sprite_count < MAX_SPRITES - 1) {
 			float c_local_x = c->x * flip_x_mult;
 			float c_local_y = c->y * flip_y_mult;
 
