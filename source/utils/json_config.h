@@ -1,0 +1,28 @@
+#pragma once
+#include <json-c/json.h>
+
+#define CONFIG_PARENT "/3ds/"
+#define CONFIG_ROOT CONFIG_PARENT "gd3ds/"
+#define CONFIG_FILENAME "config.json"
+#define CONFIG_FILE CONFIG_ROOT CONFIG_FILENAME
+
+#define CONFIG_GRAPHICS_PATH "graphics."
+
+#define CONFIG_OBJECT_DELIMITER "."
+
+typedef struct {
+    struct json_object* root;
+    const char* path;
+} Config;
+
+int config_load(Config* cfg, const char* path);
+void config_save(Config* cfg);
+void config_free(Config* cfg);
+
+const char* config_get_string(Config* cfg, const char* path, const char* def);
+int config_get_int(Config* cfg, const char* path, int def);
+int config_get_bool(Config* cfg, const char* path, int def);
+
+void config_set_string(Config* cfg, const char* path, const char* value);
+void config_set_int(Config* cfg, const char* path, int value);
+void config_set_bool(Config* cfg, const char* path, int value);

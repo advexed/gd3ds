@@ -16,12 +16,14 @@
 #include "main_menu.h"
 #include "level_select.h"
 
-static bool exit = false;
+#include "save/config.h"
+
+static bool yes_exit = false;
 
 static UIScreen screen;
 
 void exit_settings(UIElement* e) {
-    exit = true;
+    yes_exit = true;
 }
 
 void wide_settings(UIElement* e) {
@@ -42,7 +44,7 @@ static UIAction actions[] = {
 
 void settings_init() {
 	ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/settings.txt");
-    exit = false;
+    yes_exit = false;
     ui_get_element_by_tag(&screen, "chk_wide")->checkbox.checked = wideEnabled;
     ui_get_element_by_tag(&screen, "chk_aa")->checkbox.checked = aaEnabled;
 }
@@ -50,7 +52,8 @@ void settings_init() {
 int settings_loop() {
     u32 kDown = hidKeysDown();
 
-    if (exit || (kDown & KEY_B)) {
+    if (yes_exit || (kDown & KEY_B)) {
+        cfg_save();
         return true;
     }
 

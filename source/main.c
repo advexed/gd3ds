@@ -15,6 +15,8 @@
 #include "level/main_levels.h"
 #include "fonts/bigFont.h"
 
+#include "save/config.h"
+
 #include <curl/curl.h>
 
 #include "menus/main_menu.h"
@@ -73,7 +75,6 @@ void no_dsp_firmware(void) {
 }
 
 void game_loop() {
-
 	int returned = load_level(main_levels[curr_level_id].gmd_path);
 	if (returned) printf("\x1b[9;1HFailed %d", returned);
 
@@ -176,23 +177,7 @@ void game_loop() {
 	game_state = STATE_LEVEL_SELECT;
 }
 
-int main(int argc, char* argv[]) {
-	// Init libs
-	romfsInit();
-	gfxInitDefault();
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(MAX_SPRITES);
-	C2D_Prepare();
-	osSetSpeedupEnable(1);
-	
-	C2D_SetTintMode(C2D_TintMult);
-	
-	if(ndspInit()) {
-		no_dsp_firmware();
-	}
-
-	ui_assets_init();
-	
+void game_assets_init() {
 	bgSheet = C2D_SpriteSheetLoad("romfs:/gfx/bg.t3x");
 	if (!bgSheet) svcBreak(USERBREAK_PANIC);
 	
@@ -205,11 +190,33 @@ int main(int argc, char* argv[]) {
 	
 	spriteSheet2 = C2D_SpriteSheetLoad("romfs:/gfx/portals.t3x");
 	if (!spriteSheet2) svcBreak(USERBREAK_PANIC);
+}
+
+
+int main(int argc, char* argv[]) {
+	// Init libs
+	romfsInit();
+	gfxInitDefault();
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	C2D_Init(MAX_SPRITES);
+	C2D_Prepare();
+	osSetSpeedupEnable(1);
+
+	cfg_init();
+	
+	C2D_SetTintMode(C2D_TintMult);
+	
+	if(ndspInit()) {
+		no_dsp_firmware();
+	}
+
+	ui_assets_init();
+	game_assets_init();
 
 	cache_all_sprites();
 
 	top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, aaEnabled);
-	bot = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+	bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, aaEnabled);
 
 	bool exit = false;
 	while (aptMainLoop() && !exit) {
@@ -236,9 +243,12 @@ int main(int argc, char* argv[]) {
 	C2D_SpriteSheetFree(spriteSheet2);
 	C2D_SpriteSheetFree(bgSheet);
 	C2D_SpriteSheetFree(ui_sheet);
+	C2D_SpriteSheetFree(ui_2_sheet);
 	C2D_SpriteSheetFree(groundSheet);
 	C2D_SpriteSheetFree(bigFont_sheet);
 	C2D_SpriteSheetFree(window_sheet);
+
+	cfg_fini();
 
 	// Deinit libs
 	C2D_Fini();

@@ -57,7 +57,7 @@ endif
 ASFLAGS := -g $(ARCH)
 LDFLAGS = -specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) 
 
-LIBS := -lcitro2d -lcitro3d -lctru -lz -lmpg123 -lm `$(PREFIX)pkg-config mbedtls libcurl --libs`
+LIBS := -lcitro2d -lcitro3d -lctru -lz -lmpg123 -lm -ljson-c `$(PREFIX)pkg-config mbedtls libcurl --libs`
 LIBDIRS := $(PORTLIBS) $(CTRULIB) ./lib
 
 #---------------------------------------------------------------------------------
