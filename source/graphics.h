@@ -17,6 +17,10 @@
 #define MAX_SPRITES   8192
 #define SCALE (SCREEN_HEIGHT / (11.f * 30))
 
+#define SCREEN_HEIGHT_AREA (11.f*30)
+
+#define CAMERA_Y_OFFSET (SCREEN_HEIGHT_AREA - (SCREEN_HEIGHT_AREA * SCALE))
+
 extern bool aaEnabled;
 extern bool wideEnabled;
 extern bool glowEnabled; 

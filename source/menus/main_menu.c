@@ -158,6 +158,7 @@ void main_menu_loop() {
             draw_background(bg_scroll / 8, SCREEN_HEIGHT);
             C2D_ViewScale(SCALE, SCALE);
             draw_ground(bg_scroll, 0, 0, false, 320);
+
             C2D_ViewScale(1/SCALE, 1/SCALE);
 
             ui_screen_draw(&screen);

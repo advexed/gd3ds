@@ -6,8 +6,6 @@
 
 #define MAX_LEVEL_HEIGHT 2400.f
 
-#define SCREEN_HEIGHT_AREA (GSP_SCREEN_WIDTH * SCALE - 26)
-
 typedef struct {
     float x;
     float y;

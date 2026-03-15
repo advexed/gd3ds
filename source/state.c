@@ -8,8 +8,7 @@ GameState state;
 void run_camera() {
     Player *player = &state.player;
 
-    /*
-    float calc_x = (player->x - state.camera_x);
+    //float calc_x = (player->x - state.camera_x);
 
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
@@ -19,6 +18,7 @@ void run_camera() {
     }
     state.ground_y_gfx = ease_out(state.ground_y_gfx, calc_height, 0.02f);
 
+    /*
     if (level_info.wall_y == 0) {
         if (state.camera_x + WIDTH_ADJUST_AREA + SCREEN_WIDTH_AREA >= level_info.wall_x - (4.5f * 30.f)) {
             level_info.wall_y = MAX(state.camera_y, -30) + (SCREEN_HEIGHT_AREA / 2);
@@ -58,8 +58,9 @@ void run_camera() {
             state.camera_x = final_camera_x_wall + 3.f * random_float(-1, 1);
             state.camera_y = final_camera_y_wall + 3.f * random_float(-1, 1);
         }
-    } else */if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
-        float distance = state.camera_y_lerp + (SCREEN_HEIGHT_AREA / 2) - player->y;
+    } else */
+     if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
+        float distance = state.camera_y_lerp + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET) - player->y;
         float distance_abs = fabsf(distance);
 
         int mult = (distance >= 0 ? 1 : -1);
@@ -70,7 +71,7 @@ void run_camera() {
             float lerp_ratio = 0.1f;
             if (player->on_ground) {
                 // Slowly make player in bounds (60 units from player center)
-                state.camera_y_lerp = player->y + 60.f * mult - (SCREEN_HEIGHT_AREA / 2);
+                state.camera_y_lerp = player->y + 60.f * mult - ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
                 lerp_ratio = 0.2f;
             } else {
                 // Move camera
@@ -119,7 +120,7 @@ void set_camera_x(float x) {
 
 void set_intended_ceiling() {
     float mid_point = (state.ground_y + state.ceiling_y) / 2;
-    state.camera_intended_y = mid_point - (SCREEN_HEIGHT_AREA / 2);
+    state.camera_intended_y = mid_point - ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
 }
 
 void set_gamemode(Player *player, int gamemode) {
@@ -216,7 +217,7 @@ void init_variables() {
     state.camera_y = state.camera_intended_y;
     state.camera_y_lerp = state.camera_y;
     state.intermediate_camera_y = state.camera_y;
-    /*
+    
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
@@ -225,5 +226,5 @@ void init_variables() {
     }
 
     state.ground_y_gfx = calc_height;
-    */
+    
 }

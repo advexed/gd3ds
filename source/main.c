@@ -144,6 +144,11 @@ void game_loop() {
             draw_objects();
 
             draw_ground(state.camera_x, state.camera_y, 0, false, SCREEN_WIDTH);
+            
+            if (state.ground_y_gfx > 2) {
+                if (state.camera_y - CAMERA_Y_OFFSET + state.ground_y_gfx > 0) draw_ground(state.camera_x, state.camera_y, state.camera_y + state.ground_y_gfx - CAMERA_Y_OFFSET, false, SCREEN_WIDTH);
+                draw_ground(state.camera_x, state.camera_y, state.camera_y - CAMERA_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
+            }
             draw_fade();
             C2D_ViewScale(1/SCALE, 1/SCALE);
 

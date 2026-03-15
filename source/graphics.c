@@ -791,6 +791,8 @@ void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_
     Color col = channels[CHANNEL_GROUND].color;
     C2D_PlainImageTint(&tint, C2D_Color32(col.r, col.g, col.b, 255), 1.f);
 
+    if (is_ceiling) y += GROUND_SIZE;
+
     // First draw the ground
     float calc_x = 0 - positive_fmodf(cam_x, GROUND_SIZE);
     float calc_y = SCREEN_HEIGHT - ((y - cam_y));
