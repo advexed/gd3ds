@@ -6,6 +6,8 @@
 
 #define MAX_LEVEL_HEIGHT 2400.f
 
+#define SCREEN_HEIGHT_AREA (GSP_SCREEN_WIDTH * SCALE - 26)
+
 typedef struct {
     float x;
     float y;
@@ -82,6 +84,7 @@ typedef struct {
 
 extern GameState state;
 
+void set_intended_ceiling();
 void set_gamemode(Player *player, int gamemode);
 void set_mini(Player *player, bool mini);
 void init_variables();

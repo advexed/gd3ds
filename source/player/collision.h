@@ -52,6 +52,7 @@ enum JumpType {
 #define DUAL_PORTAL 286
 #define DIVORCE_PORTAL 287
 
+#define BREAKABLE_BLOCK 143
 
 #define MAX_COLLIDED_OBJECTS 256
 

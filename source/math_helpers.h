@@ -9,10 +9,13 @@
 #define G_ABGR8(color) ((color >> 8) & 0xff)
 #define B_ABGR8(color) ((color >> 16) & 0xff)
 
-
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define CLAMP(x, lower, upper) (MIN((upper), MAX((x), (lower))))
+
+#define RadToDeg(a) ( (a) * 57.29577951f )
+
+#define STEPS_HZ 240
 
 float clampf(float d, float min, float max);
 float positive_fmodf(float n, float divisor);
@@ -20,3 +23,5 @@ Color color_lerp(Color color1, Color color2, float fraction);
 float map_range(float val, float min1, float max1, float min2, float max2);
 float ease_out(float current, float target, float smoothing);
 float adjust_angle(float angle, int flipX, int flipY);
+float ip1_ceilf(float x);
+float iSlerp(float a, float b, float ratio, float dt);

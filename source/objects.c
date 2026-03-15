@@ -256,6 +256,10 @@ const ObjectHitbox hitbox_141[] = {
     { HITBOX_SPECIAL, 0.00, 0.00, 36.00, 36.00, COLLISION_BOX }
 };
 
+const ObjectHitbox hitbox_143[] = {
+    { HITBOX_SOLID, 0.00, 0.00, 30.00, 30.00, COLLISION_BOX }
+};
+
 const ObjectHitbox hitbox_144[] = {
     { HITBOX_HAZARD, 0.00, 0.00, 6.00, 12.00, COLLISION_BOX }
 };
@@ -2284,7 +2288,7 @@ const GameObject game_objects[GAME_OBJECT_COUNT] = {
     { 119, 39, 0.00, 0.00, 3, 12, 0, COLOR_TYPE_WHITE, 0, 1.00, 0, NULL, hitbox_140 },
     { 629, 106, 0.00, 0.00, 3, 12, 0, COLOR_TYPE_WHITE, 0, 1.00, 0, NULL, hitbox_141 },
     { 866, -1, 0.00, 0.00, 0, 0, 0, COLOR_TYPE_WHITE, 0, 1.00, 0, NULL, NULL },
-    { 117, 36, 0.00, 0.00, 5, 2, 1004, COLOR_TYPE_BASE, 0, 1.00, 0, NULL, NULL },
+    { 117, 36, 0.00, 0.00, 5, 2, 1004, COLOR_TYPE_BASE, 0, 1.00, 0, NULL, hitbox_143 },
     { 359, 58, 0.00, 0.00, 5, 2, 1004, COLOR_TYPE_BASE, 0, 1.00, 0, NULL, hitbox_144 },
     { 361, 60, 0.00, 0.00, 5, 2, 1004, COLOR_TYPE_BASE, 0, 1.00, 0, NULL, hitbox_145 },
     { 363, 62, 0.00, 0.00, 5, 2, 1004, COLOR_TYPE_BASE, 0, 1.00, 0, NULL, hitbox_146 },

@@ -44,6 +44,14 @@ const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2]
     }
 };
 
+const int dual_gamemode_heights[GAMEMODE_COUNT] = {
+    9,  // Cube
+    10, // Ship
+    9,  // Ball
+    10, // Ufo
+    10 // Wave
+};
+
 void flip_other_player(int current_player) {
     if (state.dual && state.player.gamemode == state.player2.gamemode && state.player.upside_down == state.player2.upside_down) {
         if (current_player == 0) {
@@ -56,6 +64,27 @@ void flip_other_player(int current_player) {
             state.player.ceiling_inv_time = 0.1f;
         }
     }
+}
+
+void set_dual_bounds() {
+    int height = MAX(dual_gamemode_heights[state.player.gamemode],
+                 dual_gamemode_heights[state.player2.gamemode]);
+
+    float in_block_y = fmodf(state.dual_portal_y, 30);
+
+    int ground_offset = (ceilf(((float) height + 1) / 2) - 1) * 30;
+    state.ground_y = fmaxf(0, floorf((state.dual_portal_y - ground_offset) / 30.f)) * 30;
+
+
+    // Shift down if odd height and in the top half
+    if (height % 2 != 0) {
+        if (in_block_y < 15) {
+            state.ground_y = fmaxf(0, state.ground_y - 30);
+        }
+    }
+
+    state.ceiling_y = state.ground_y + (height * 30.f);
+    set_intended_ceiling();
 }
 
 void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) {
@@ -221,6 +250,133 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case FASTER_SPEED_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 state.speed = SPEED_FASTER;
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case CUBE_PORTAL: 
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = 0;
+                state.ceiling_y = 999999;
+                if (player->gamemode != GAMEMODE_PLAYER) {
+                    if (player->gamemode != GAMEMODE_PLAYER_BALL) {
+                        player->vel_y /= 2;
+                    }
+
+                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
+                    
+                    player->ceiling_inv_time = 0.1f;
+                    player->snap_rotation = true;
+                    set_gamemode(player, GAMEMODE_PLAYER);
+                    flip_other_player(state.current_player ^ 1);
+
+                }
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case SHIP_PORTAL: 
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + 300;
+                set_intended_ceiling();
+
+                if (player->gamemode != GAMEMODE_SHIP) {
+                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
+                    player->vel_y /= (player->gamemode == GAMEMODE_BIRD || player->gamemode == GAMEMODE_DART) ? 4 : 2;
+                    
+                    set_gamemode(player, GAMEMODE_SHIP);
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player ^ 1);
+                    
+                    float min = player->mini ? -406.566f : -345.6f;
+                    float max = player->mini ? 508.248f : 432.0f;
+
+                    if (player->vel_y < min) {
+                        player->vel_y = min;
+                    } else if (player->vel_y > max) {
+                        player->vel_y = max;
+                    }
+                }
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case BALL_PORTAL: 
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 150) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + 240;
+                set_intended_ceiling();
+
+                if (player->gamemode != GAMEMODE_PLAYER_BALL) {
+                    player->ball_rotation_speed = -1.f;
+
+                    switch (player->gamemode) {
+                        case GAMEMODE_DART:
+                            player->vel_y *= 0.9f;
+                            player->vel_y /= 2;
+                        case GAMEMODE_SHIP:
+                        case GAMEMODE_BIRD:
+                            player->vel_y /= 2;
+                            break;
+                    }
+                    
+                    set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player ^ 1);
+                }
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case UFO_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + 300;
+                set_intended_ceiling();
+                
+                if (player->gamemode != GAMEMODE_BIRD) {
+                    if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
+                    player->vel_y /= (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) ? 4 : 2;
+                    set_gamemode(player, GAMEMODE_BIRD);
+                    player->ufo_last_y = player->y;
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player ^ 1);
+
+                    if (state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
+                        player->buffering_state = BUFFER_READY;
+                    }
+                }
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
+                SET_ACTIVATED(obj, true);
+            }
+            break;
+        case WAVE_PORTAL:
+            if (!GET_ACTIVATED(obj)) {
+                state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 180) / 30.f)) * 30;
+                state.ceiling_y = state.ground_y + 300;
+                set_intended_ceiling();
+
+                if (player->gamemode != GAMEMODE_DART) {
+                    set_gamemode(player, GAMEMODE_DART);
+                    player->inverse_rotation = false;
+                    player->snap_rotation = true;
+                    flip_other_player(state.current_player ^ 1);
+                }
+
+                if (state.dual) {
+                    set_dual_bounds();
+                } 
                 SET_ACTIVATED(obj, true);
             }
             break;
@@ -412,16 +568,13 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->x, player->y, internal.width, internal.height, 0, 
                 objects.x[obj], objects.y[obj], hitbox->width, hitbox->height, objects.rotation[obj]
             )) {
-                /*if (hitbox->type == HITBOX_BREAKABLE_BLOCK) {
+                if (objects.id[obj] == BREAKABLE_BLOCK) {
                     // Spawn breakable brick particles
-                    obj->hide_sprite = TRUE;
-                    for (s32 i = 0; i < 10; i++) {
-                        spawn_particle(BREAKABLE_BRICK_PARTICLES, *soa_x(obj), *soa_y(obj), obj);
-                    }
-                } else {*/
+                    objects.id[obj] = 0;
+                } else {
                     // Not a brick, die
                     state.dead = true;
-                //}
+                }
             // Check snap for player bottom
             } else if (obj_gravTop(player, obj) - gravBottom(player) <= clip && player->vel_y <= 0 &&/* !slope_condition && */player->gamemode != GAMEMODE_DART) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
@@ -432,12 +585,12 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
             // Check snap for player top
             } else if (player->gamemode != GAMEMODE_DART) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling
-                if (player->gamemode == GAMEMODE_BIRD/* && hitbox->type == HITBOX_BREAKABLE_BLOCK*/) {
+                if (player->gamemode == GAMEMODE_BIRD && objects.id[obj] == BREAKABLE_BLOCK) {
                     break;
                 }
                 // Behave normally
                 if (player->gamemode != GAMEMODE_PLAYER || gravSnap) {
-                    if (((gravTop(player) - obj_gravBottom(player, obj) <= clip || gravSnap))) {// && !slope_condition) {
+                    if ((((gravTop(player) - obj_gravBottom(player, obj) <= clip && player->vel_y >= 0) || gravSnap))) {// && !slope_condition) {
                         if (!gravSnap) player->on_ceiling = true;
                         player->inverse_rotation = false;
                         player->time_since_ground = 0;

@@ -5,6 +5,7 @@
 
 #include "menus/icon_kit.h"
 #include "collision.h"
+#include "math_helpers.h"
 
 
 const float player_speeds[SPEED_COUNT] = {
@@ -96,6 +97,155 @@ void cube_gamemode(Player *player) {
     }
 }
 
+void update_ship_rotation(Player *player) {
+    float diff_x = (player->x - state.old_player.x);
+    float diff_y = (player->y - state.old_player.y);
+    float angle_rad = atan2f(-diff_y, diff_x);
+    if (player->snap_rotation) {
+        player->rotation = RadToDeg(angle_rad);
+    } else {
+        player->rotation = iSlerp(player->rotation, RadToDeg(angle_rad), 0.05f, STEPS_DT);
+    }
+}
+
+void ship_gamemode(Player *player) {
+    if (state.dual) {
+        // Make both dual players symetric
+        if (state.input.holdJump) {
+            player->buffering_state = BUFFER_END;
+            if (player->vel_y <= -101.541492f)
+                player->gravity = player->mini ? 1643.5872f : 1397.0491f;
+            else
+                player->gravity = player->mini ? 1314.86976f : 1117.64328f;
+        } else {
+            if (player->vel_y >= -101.541492f)
+                player->gravity = player->mini ? -1577.85408f : -1341.1719f;
+            else
+                player->gravity = player->mini ? -1051.8984f : -894.11464f;
+        }
+    } else {
+        if (state.input.holdJump) {
+            player->buffering_state = BUFFER_END;
+            if (player->vel_y <= grav(player, 101.541492f))
+                player->gravity = player->mini ? 1643.5872f : 1397.0491f;
+            else
+                player->gravity = player->mini ? 1314.86976f : 1117.64328f;
+        } else {
+            if (player->vel_y >= grav(player, 101.541492f))
+                player->gravity = player->mini ? -1577.85408f : -1341.1719f;
+            else
+                player->gravity = player->mini ? -1051.8984f : -894.11464f;
+        }
+    }
+    
+    float min = player->mini ? -406.566f : -345.6f;
+    float max = player->mini ? 508.248f : 432.0f;
+
+    if (player->gravity < 0 && player->vel_y < min) {
+        player->vel_y = min;
+    } else if (player->gravity > 0 && player->vel_y > max) {
+        player->vel_y = max;
+    }
+}
+
+
+static float ballJumpHeights[SPEED_COUNT] = {
+    -172.044007,
+    -181.11601,
+    -185.00401,
+    -181.92601
+};
+
+void ball_gamemode(Player *player) {
+    int mult = (player->upside_down ? -1 : 1);
+
+    player->gravity = -1676.46672f;  
+    
+    if (player->on_ground || player->on_ceiling) {
+        player->ball_rotation_speed = 2.3;
+    }
+
+    // Jump
+    if ((state.input.holdJump) && (player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
+        float delta_y = player->vel_y;
+
+        player->upside_down ^= 1;
+
+        set_p_velocity(player, ballJumpHeights[state.speed]);
+
+        player->vel_y -= (delta_y < 0) ? 0 : delta_y;
+        player->buffering_state = BUFFER_END;
+        
+        player->ball_rotation_speed = -1.f;
+
+        player->on_ground = false;
+    }
+    
+    player->rotation += player->ball_rotation_speed * mult * (player_speeds[state.speed] / player_speeds[SPEED_NORMAL]) / (player->mini ? 0.8 : 1);
+
+    if (player->vel_y < -810) {
+        player->vel_y = -810;
+    } else if (player->vel_y > 810) {
+        player->vel_y = 810;
+    }
+}
+
+void ufo_gamemode(Player *player) {
+    int mult = (player->upside_down ? -1 : 1);
+    bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) && (state.input.holdJump));
+    if (player->buffering_state == BUFFER_READY && (state.input.pressedJump || buffering_check)) {
+        player->vel_y = fmaxf(player->vel_y, player->mini ? 358.992 : 371.034);
+        player->buffering_state = BUFFER_END;
+        player->ufo_last_y = player->y;
+    } else {
+        if (!state.dual) {
+            if (player->vel_y > grav(player, 103.485494)) {
+                player->gravity = player->mini ? -1969.92 : -1676.84;
+            } else {
+                player->gravity = player->mini ? -1308.96 : -1117.56;
+            }
+        } else {   
+            if (player->vel_y > -103.485494) {
+                player->gravity = player->mini ? -1969.92 : -1676.84;
+            } else {
+                player->gravity = player->mini ? -1308.96 : -1117.56;
+            }
+        }
+    }
+
+    if (player->on_ground) {
+        player->ufo_last_y = player->y;
+    }
+
+    //if (!player->slope_data.slope) {
+        float y_diff = (player->y - player->ufo_last_y) * mult;
+
+        if (y_diff >= 0) {
+            player->rotation = map_range(y_diff, 0.f, 60.f, 0.f, 10.f) * mult;
+        } else {
+            player->rotation = -map_range(-y_diff, 0.f, 300.f, 0.f, 25.f) * mult;
+        }
+    //}
+
+    float min = player->mini ? -406.566f : -345.6f;
+    float max = player->mini ? 508.248f : 432.0f;
+
+    if (player->vel_y < min) {
+        player->vel_y = min;
+    } else if (player->vel_y > max) {
+        player->vel_y = max;
+    }
+}
+
+void wave_gamemode(Player *player) {
+    if (player->buffering_state == BUFFER_READY) player->buffering_state = BUFFER_END;
+
+    bool input = (state.input.holdJump);
+    player->gravity = 0;
+
+    player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
+}
+
 void run_player(Player *player) {
     //float scale = (player->mini) ? 0.6f : 1.f;
     //trail.stroke = 10.f * scale;
@@ -129,54 +279,19 @@ void run_player(Player *player) {
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
             cube_gamemode(player);
-
-            /*if (p1_trail && (frame_counter & 0b1111) == 0) {
-                particle_templates[P1_TRAIL].start_scale = 0.73333f * scale;
-                particle_templates[P1_TRAIL].end_scale = 0.73333f * scale;
-                spawn_particle(P1_TRAIL, player->x, player->y, NULL);
-            }*/
             break;
-        /*case GAMEMODE_SHIP:
-            MotionTrail_ResumeStroke(&trail);
-            spawn_glitter_particles();
+        case GAMEMODE_SHIP:
             ship_gamemode(player);
-
-            if (p1_trail && (frame_counter & 0b1111) == 0) {
-                particle_templates[P1_TRAIL].start_scale = 0.73333f * scale / 1.8;
-                particle_templates[P1_TRAIL].end_scale = 0.73333f * scale / 1.8;
-                spawn_particle(P1_TRAIL, player->x, player->y, NULL);
-            }
             break;
-        case GAMEMODE_BALL:
+        case GAMEMODE_PLAYER_BALL:
             ball_gamemode(player);
-            if (p1_trail && (frame_counter & 0b1111) == 0) {
-                particle_templates[P1_TRAIL].start_scale = 0.73333f * scale;
-                particle_templates[P1_TRAIL].end_scale = 0.73333f * scale;
-                spawn_particle(P1_TRAIL, player->x, player->y, NULL);
-            }
             break;
-        case GAMEMODE_UFO:
-            MotionTrail_ResumeStroke(&trail);
-            spawn_glitter_particles();
+        case GAMEMODE_BIRD:
             ufo_gamemode(player);
-
-            if (p1_trail && (frame_counter & 0b1111) == 0) {
-                particle_templates[P1_TRAIL].start_scale = 0.73333f * scale / 1.8;
-                particle_templates[P1_TRAIL].end_scale = 0.73333f * scale / 1.8;
-                spawn_particle(P1_TRAIL, player->x, player->y, NULL);
-            }
             break;
-        case GAMEMODE_WAVE:
-            MotionTrail_ResumeStroke(&trail);
-            spawn_glitter_particles();
+        case GAMEMODE_DART:
             wave_gamemode(player);
-
-            if (p1_trail && (frame_counter & 0b1111) == 0) {
-                particle_templates[P1_TRAIL].start_scale = 0.73333f * scale / 1.8;
-                particle_templates[P1_TRAIL].end_scale = 0.73333f * scale / 1.8;
-                spawn_particle(P1_TRAIL, player->x, player->y, NULL);
-            }
-            break;*/
+            break;
     }
     
     player->time_since_ground += STEPS_DT;
@@ -197,15 +312,15 @@ void run_player(Player *player) {
     if (player->snap_rotation) {
         player->lerp_rotation = player->rotation;
     } else {
-        /*if (player->gamemode == GAMEMODE_BIRD) {
-            if (player->slope_data.slope) {
+        if (player->gamemode == GAMEMODE_BIRD) {
+            if (player->slope_data.slope_id) {
                 player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.05f, STEPS_DT);
             } else {
                 player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.1f, STEPS_DT);
             }
         } else {
             player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.2f, STEPS_DT);
-        }*/
+        }
     }
     
     player->vel_x = player_speeds[state.speed];
@@ -264,9 +379,9 @@ void run_player(Player *player) {
     if (player->slope_data.slope) {
         slope_calc(player->slope_data.slope, player);
     }
-    
-    if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_WAVE) update_ship_rotation(player);
 */
+    if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) update_ship_rotation(player);
+
     player->snap_rotation = false;
 }
 
@@ -308,7 +423,35 @@ void draw_player(Player *player) {
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
-            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, calc_x, calc_y, player->rotation, false, false, scale, 
+            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, calc_x, calc_y, player->lerp_rotation, false, false, scale, 
+                C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
+                C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+            );
+            break;
+        case GAMEMODE_SHIP:
+            spawn_icon_at(GAMEMODE_SHIP, selected_ship, player_glow_enabled, calc_x, calc_y, player->lerp_rotation, false, player->upside_down, scale, 
+                C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
+                C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+            );
+            break;
+        case GAMEMODE_PLAYER_BALL:
+            spawn_icon_at(GAMEMODE_PLAYER_BALL, selected_ball, player_glow_enabled, calc_x, calc_y, player->lerp_rotation, false, false, scale, 
+                C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
+                C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+            );
+            break;
+        case GAMEMODE_BIRD:
+            spawn_icon_at(GAMEMODE_BIRD, selected_ufo, player_glow_enabled, calc_x, calc_y, player->lerp_rotation, false, player->upside_down, scale, 
+                C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
+                C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
+                C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
+            );
+            break;    
+        case GAMEMODE_DART:
+            spawn_icon_at(GAMEMODE_DART, selected_wave, player_glow_enabled, calc_x, calc_y, player->lerp_rotation, false, false, scale, 
                 C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
                 C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
