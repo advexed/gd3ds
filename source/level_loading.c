@@ -1126,6 +1126,8 @@ void reload_level() {
         if (objects.id[i] == 0) objects.id[i] = BREAKABLE_BLOCK; 
     }
 
+    current_fading_effect = FADE_NONE;
+
     init_col_channels();
     set_color_channels();
 }
