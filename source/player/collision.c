@@ -413,12 +413,12 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 setup_dual();
 
                 if (player->gamemode == GAMEMODE_DART) {
-                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, p1_color, C2D_SpriteSheetGetImage(trailSheet, 0));   
+                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
                     wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(&wave_trail_p2);
                 }
-                MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, p1_color, C2D_SpriteSheetGetImage(trailSheet, 0));
+                MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));
 
                 SET_ACTIVATED(obj, true);
             }

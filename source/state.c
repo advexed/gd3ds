@@ -135,10 +135,10 @@ void init_variables() {
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
 
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, p2_color, img);
-    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, p1_color, img);
-    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, p2_color, img);
-    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, p1_color, img);
+    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, get_white_if_black(p2_color), img);
+    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, get_white_if_black(p1_color), img);
+    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, get_white_if_black(p2_color), img);
+    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), img);
     MotionTrail_StopStroke(&trail_p1);
     MotionTrail_StopStroke(&trail_p2);
 
