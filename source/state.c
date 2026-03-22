@@ -136,6 +136,8 @@ void set_mini(Player *player, bool mini) {
 }
 
 void init_variables() {
+    level_frame = 0;
+    
     C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
 
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
@@ -157,6 +159,7 @@ void init_variables() {
 
     current_fading_effect = FADE_NONE;
     memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
+    memset(&state.player.snap_data, 0, sizeof(SnapData));
     state.player.p1_trail_pos = 0;
     p1_trail = false;
     state.death_timer = 0.f;
@@ -181,6 +184,7 @@ void init_variables() {
     player->y = player->height / 2;
     player->vel_x = player_speeds[state.speed];  
     player->vel_y = 0;
+    player->frame = 0;
     state.ground_y = 0;
     state.ceiling_y = 999999;
 

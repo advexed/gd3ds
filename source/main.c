@@ -133,6 +133,7 @@ float particle_calc_time = 0;
 float triggers_time = 0;
 
 float delta = 0;
+unsigned int level_frame = 0;
 unsigned int frame_counter = 0;
 
 void game_loop() {
@@ -245,6 +246,7 @@ void game_loop() {
                 run_camera();
                 accumulator -= STEPS_DT;
                 steps++;
+                level_frame++;
             }
         }
         

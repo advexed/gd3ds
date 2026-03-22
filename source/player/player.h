@@ -24,6 +24,11 @@ typedef struct {
 } SlopeData;
 
 typedef struct {
+    int object_id;
+    int player_frame;
+} SnapData;
+
+typedef struct {
     float width;
     float height;
 } InternalHitbox;
@@ -99,8 +104,12 @@ typedef struct {
 
     int slope_slide_coyote_time;
 
+    int frame;
+
     SlopeData coyote_slope;
     SlopeData slope_data;
+
+    SnapData snap_data;
     
     int p1_trail_pos;
     P1Trail p1_trail_data[P1_TRAIL_LENGTH];

@@ -9,6 +9,7 @@
 #include "menus/components/ui_screen.h"
 #include "math_helpers.h"
 #include "slope.h"
+#include "main.h"
 
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
     { // SLOW               CUBE                   SHIP                  BALL                    UFO                 WAVE   },
@@ -52,6 +53,134 @@ const int dual_gamemode_heights[GAMEMODE_COUNT] = {
     10, // Ufo
     10 // Wave
 };
+
+const Vec2D slowSpeedSnaps[3] = {
+    {
+        .x = 120,
+        .y = -30
+    },
+    {
+        .x = 90,
+        .y = 30
+    },
+    {
+        .x = 60,
+        .y = 60
+    },
+};
+
+const Vec2D normalSpeedSnaps[3] = {
+    {
+        .x = 150,
+        .y = -30
+    },
+    {
+        .x = 120,
+        .y = 30
+    },
+    {
+        .x = 90,
+        .y = 60
+    },
+};
+
+const Vec2D fastSpeedSnaps[3] = {
+    {
+        .x = 180,
+        .y = -30
+    },
+    {
+        .x = 150,
+        .y = 30
+    },
+    {
+        .x = 120,
+        .y = 60
+    },
+};
+
+const Vec2D fasterSpeedSnaps[3] = {
+    {
+        .x = 225,
+        .y = -30
+    },
+    {
+        .x = 180,
+        .y = 30
+    },
+    {
+        .x = 135,
+        .y = 60
+    },
+};
+
+const Vec2D defaultSpeedSnaps[3] = {
+    {
+        .x = 150,
+        .y = -30
+    },
+    {
+        .x = 120,
+        .y = 30
+    },
+    {
+        .x = 90,
+        .y = 60
+    },
+};
+
+float snap_player(Vec2D diff, Player *player) {
+    Vec2D stairs[3];
+    float threshold;
+    switch (state.speed) {
+        case SPEED_SLOW:
+            memcpy(&stairs, &slowSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 1;
+            break;
+        case SPEED_NORMAL:
+            memcpy(&stairs, &normalSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 1;
+            stairs[1].x = (player->mini ? 90 : 120);
+            break;
+        case SPEED_FAST:
+            memcpy(&stairs, &fastSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 2;
+            stairs[1].x = (player->mini ? 90 : 150);
+            break;
+        case SPEED_FASTER:
+            memcpy(&stairs, &fasterSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 2;
+            stairs[1].x = (player->mini ? 90 : 180);
+            break;
+        default:
+            memcpy(&stairs, &defaultSpeedSnaps, sizeof(Vec2D) * 3);
+            threshold = 2;
+    }   
+
+    // Check snaps
+    for (int i = 0; i < 3; i++) {
+        Vec2D stair = stairs[i];
+        if (fabsf(diff.x - stair.x) <= threshold && fabsf(diff.y - stair.y) <= threshold) {
+            return threshold;
+        }
+    }
+    return 0;
+}
+
+void trySnap(int block, Player *player) {
+    Vec2D diff;
+    diff.x = objects.x[block] - objects.x[player->snap_data.object_id];
+    diff.y = objects.y[block] - objects.y[player->snap_data.object_id];
+    diff.y = grav(player, diff.y);
+    float threshold = snap_player(diff, player);
+    if (threshold > 0) {
+        player->x = clampf(
+            player->x + diff.x,
+            player->x - threshold,
+            player->x + threshold
+        );
+    }
+}
 
 void flip_other_player(int current_player) {
     if (state.dual && state.player.gamemode == state.player2.gamemode && state.player.upside_down == state.player2.upside_down) {
@@ -666,6 +795,17 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                 player->on_ground = true;
                 player->inverse_rotation = false;
                 player->time_since_ground = 0;
+
+                if (player->gamemode == GAMEMODE_PLAYER) {
+                    if (!state.old_player.on_ground) {
+                        if (player->snap_data.player_frame > 0 && player->snap_data.player_frame + 1 < player->frame) {
+                            trySnap(obj, player);
+                        }
+                    }
+
+                    player->snap_data.player_frame = level_frame;
+                    player->snap_data.object_id = obj;
+                }
             // Check snap for player top
             } else if (player->gamemode != GAMEMODE_DART) {
                 // Ufo can break breakable blocks from above, so dont use as a ceiling

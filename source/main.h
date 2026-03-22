@@ -9,6 +9,8 @@
 extern float delta;
 extern unsigned int frame_counter;
 
+extern unsigned int level_frame;
+
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 

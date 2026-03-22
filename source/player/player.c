@@ -449,6 +449,7 @@ void run_player(Player *player) {
         
         if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) player->vel_y = 0;
         player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
+        player->snap_data.player_frame = 0;
     }
 
     // Ceiling
@@ -498,6 +499,8 @@ void handle_player(Player *player) {
     player->gravObj_id = -1;
     
     player->timeElapsed += STEPS_DT;
+
+    player->frame++;
 
     collide_with_objects(player);
     
