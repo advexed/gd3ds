@@ -506,17 +506,108 @@ void handle_player(Player *player) {
 
 }
 
+
+
+void spawn_p1_trail(Player *player) {
+    P1Trail *trail_data = &player->p1_trail_data[player->p1_trail_pos];
+    
+    float scale = (player->mini) ? 0.6f : 1.f;
+
+    switch (player->gamemode) {
+        case GAMEMODE_PLAYER:
+        case GAMEMODE_PLAYER_BALL:
+        case GAMEMODE_DART:
+            trail_data->gamemode = player->gamemode;
+            trail_data->scale = scale;
+            break;
+        case GAMEMODE_SHIP:
+        case GAMEMODE_BIRD:
+            trail_data->gamemode = GAMEMODE_PLAYER;
+            trail_data->scale = scale * 0.5f;
+
+    }
+
+    float end_scale = trail_data->scale * P1_TRAIL_END_SCALE;
+
+    trail_data->delta_scale = (end_scale - trail_data->scale) / P1_TRAIL_DURATION;
+    
+    trail_data->x = player->x;
+    trail_data->y = player->y;
+    trail_data->rot = player->lerp_rotation;
+    trail_data->opacity = 1.f;
+    trail_data->life = P1_TRAIL_DURATION;
+
+    trail_data->active = true;
+
+    player->p1_trail_pos++;
+    if (player->p1_trail_pos >= P1_TRAIL_LENGTH) {
+        player->p1_trail_pos = 0;
+    }
+}
+
+void update_p1_trail(Player *player) {
+    if (p1_trail) {
+        // Spawn new p1 icon
+        if ((frame_counter & 0b11) == 0) {
+            spawn_p1_trail(player);
+        }
+
+        for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
+            P1Trail *trail_data = &player->p1_trail_data[i];
+
+            if (trail_data->active) {
+                trail_data->opacity -= (1.f / P1_TRAIL_DURATION) * delta;
+                trail_data->scale += trail_data->delta_scale * delta;
+
+                trail_data->life -= delta;
+
+                if (trail_data->life <= 0) {
+                    trail_data->active = false;
+                }
+            }
+        }
+    }
+}
+
+void draw_p1_trail(Player *player) {
+    if (p1_trail) {
+        for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
+            P1Trail *trail_data = &player->p1_trail_data[i];
+
+            if (trail_data->active) {
+                float calc_x = ((trail_data->x - state.camera_x));
+                float calc_y = SCREEN_HEIGHT - ((trail_data->y - state.camera_y));
+                bool flip_x = (state.mirror_mult < 0);
+
+                u32 color = (state.current_player == 1) ? C2D_Color32(p2_color.r, p2_color.g, p2_color.b, trail_data->opacity * 255) : C2D_Color32(p1_color.r, p1_color.g, p1_color.b, trail_data->opacity * 255);
+
+                spawn_p1_layer_at(
+                    trail_data->gamemode, *current_icons[trail_data->gamemode], 
+                    get_mirror_x(calc_x, state.mirror_factor), calc_y, 
+                    trail_data->rot,  
+                    flip_x, player->upside_down,
+                    trail_data->scale,
+                    color
+                );
+            }
+        }
+    }
+}
+
 void draw_player(Player *player) {
     MotionTrail_Update(&trail, delta);
     MotionTrail_UpdateWaveTrail(&wave_trail, delta);
+    update_p1_trail(player);
 
     change_blending(true);
+    draw_p1_trail(player);
     MotionTrail_Draw(&trail);
     MotionTrail_DrawWaveTrail(&wave_trail);
+
     change_blending(false);
 
     float calc_x = ((player->x - state.camera_x));
-    float calc_y = GSP_SCREEN_WIDTH - ((player->y - state.camera_y));
+    float calc_y = SCREEN_HEIGHT - ((player->y - state.camera_y));
 
     u32 primary_color = C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255);
     u32 secondary_color = C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255);
@@ -534,7 +625,7 @@ void draw_player(Player *player) {
     float cos_r = cosf(rad);
     float sin_r = sinf(rad);
 
-    int flip_x_mult = (state.mirror_mult < 0);
+    bool flip_x = (state.mirror_mult < 0);
     int flip_y_mult = (player->upside_down ? -1 : 1);
 
     float m00 = cos_r;
@@ -556,45 +647,45 @@ void draw_player(Player *player) {
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
-            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x_mult, false, scale, 
+            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;
         case GAMEMODE_SHIP:
-            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x_mult, player->upside_down, scale * 0.5f, 
+            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
-            spawn_icon_at(GAMEMODE_SHIP, selected_ship, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x_mult, player->upside_down, scale, 
+            spawn_icon_at(GAMEMODE_SHIP, selected_ship, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;
         case GAMEMODE_PLAYER_BALL:
-            spawn_icon_at(GAMEMODE_PLAYER_BALL, selected_ball, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x_mult, false, scale, 
+            spawn_icon_at(GAMEMODE_PLAYER_BALL, selected_ball, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;
         case GAMEMODE_BIRD:
-            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x_mult, player->upside_down, scale * 0.5f, 
+            spawn_icon_at(GAMEMODE_PLAYER, selected_cube, player_glow_enabled, p_x, p_y, p_rot, flip_x, player->upside_down, scale * 0.5f, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
-            spawn_icon_at(GAMEMODE_BIRD, selected_ufo, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x_mult, player->upside_down, scale, 
+            spawn_icon_at(GAMEMODE_BIRD, selected_ufo, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, player->upside_down, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)
             );
             break;    
         case GAMEMODE_DART:
-            spawn_icon_at(GAMEMODE_DART, selected_wave, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x_mult, false, scale, 
+            spawn_icon_at(GAMEMODE_DART, selected_wave, player_glow_enabled, calc_x_mirror, calc_y, p_rot, flip_x, false, scale, 
                 primary_color,
                 secondary_color,
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)

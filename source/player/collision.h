@@ -75,6 +75,9 @@ enum JumpType {
 
 #define BREAKABLE_BLOCK 143
 
+#define ENABLE_TRAIL 32
+#define DISABLE_TRAIL 33
+
 #define MAX_COLLIDED_OBJECTS 256
 
 void setup_dual();

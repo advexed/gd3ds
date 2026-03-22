@@ -133,6 +133,7 @@ float particle_calc_time = 0;
 float triggers_time = 0;
 
 float delta = 0;
+unsigned int frame_counter = 0;
 
 void game_loop() {
     int returned = load_level(main_levels[curr_level_id].gmd_path);
@@ -246,6 +247,8 @@ void game_loop() {
                 steps++;
             }
         }
+        
+        frame_counter++;
 
         if (state.dead && state.death_timer <= 0.f) {
             state.death_timer = 1.f;

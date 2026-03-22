@@ -13,6 +13,10 @@ extern int frame_skipped;
 #define STEPS_DT ((1.f + frame_skipped) / STEPS_HZ) // 1/240 seconds per physics step
 #define STEPS_DT_UNMOD (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
+#define P1_TRAIL_LENGTH 10
+#define P1_TRAIL_DURATION 0.4f
+#define P1_TRAIL_END_SCALE 0.8f
+
 typedef struct {
     int slope_id;
     float elapsed;
@@ -23,6 +27,23 @@ typedef struct {
     float width;
     float height;
 } InternalHitbox;
+
+
+typedef struct {
+    int gamemode;
+    float x;
+    float y;
+    float rot;
+
+    float scale;
+    float delta_scale;
+
+    float opacity;
+
+    float life;
+
+    bool active;
+} P1Trail;
 
 typedef struct {
     float x;
@@ -80,6 +101,9 @@ typedef struct {
 
     SlopeData coyote_slope;
     SlopeData slope_data;
+    
+    int p1_trail_pos;
+    P1Trail p1_trail_data[P1_TRAIL_LENGTH];
 } Player;
 
 enum BufferingState {

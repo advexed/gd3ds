@@ -90,6 +90,8 @@ void set_dual_bounds() {
 
 void setup_dual() {
     memcpy(&state.player2, &state.player, sizeof(Player));
+    memset(&state.player2.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_DURATION);
+    state.player2.p1_trail_pos = 0;
     state.player2.upside_down = state.player.upside_down ^ 1;
     set_dual_bounds();
 }

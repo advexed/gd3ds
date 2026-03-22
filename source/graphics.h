@@ -82,6 +82,7 @@ void free_cached_sprites();
 void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale);
 int obj_edge_fade(float x, int right_edge);
 
+extern bool p1_trail;
 extern int current_fading_effect;
 
 extern int sprite_count;
@@ -130,5 +131,16 @@ void spawn_icon_at(
     u32 p1_color,
     u32 p2_color,
     u32 glow_color
+);
+void spawn_p1_layer_at(
+    int gamemode,
+    int id,
+    float x,
+    float y,
+    float deg,
+    unsigned char flip_x,
+    unsigned char flip_y,
+    float scale,
+    u32 p1_color
 );
 void handle_mirror_transition();

@@ -7,6 +7,7 @@
 #define DT (1.f/60)
 
 extern float delta;
+extern unsigned int frame_counter;
 
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240

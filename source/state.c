@@ -155,8 +155,10 @@ void init_variables() {
     state.intended_mirror_speed_factor = 1.f;
 
 
-    //current_fading_effect = FADE_NONE;
-    //p1_trail = FALSE;
+    current_fading_effect = FADE_NONE;
+    memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
+    state.player.p1_trail_pos = 0;
+    p1_trail = false;
     state.death_timer = 0.f;
 
     level_info.completing = false;

@@ -249,13 +249,13 @@ void run_trigger(int obj) {
             upload_to_buffer(obj, CHANNEL_3DL);
             break;
 
-//        case ENABLE_TRAIL:
-//            p1_trail = TRUE;
-//            break;
-//        
-//        case DISABLE_TRAIL:
-//            p1_trail = FALSE;
-//            break;
+        case ENABLE_TRAIL:
+            p1_trail = true;
+            break;
+        
+        case DISABLE_TRAIL:
+            p1_trail = false;
+            break;
 
         case COL_TRIGGER: // 2.0 color trigger
             upload_to_buffer(obj, objects.target_color_id[obj]);

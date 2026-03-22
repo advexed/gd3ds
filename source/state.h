@@ -81,6 +81,7 @@ typedef struct {
     int last_hitbox_trail;
     PlayerHitboxTrail hitbox_trail_players[2][HITBOX_TRAIL_SIZE];
     */
+
     KeyInput input;
 } GameState;
 
