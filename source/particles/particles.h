@@ -17,6 +17,7 @@ typedef struct {
     float* dirX;
     float* dirY;
 
+    float *gravityX;
     float *gravityY;
 
     float* radialAccel;
@@ -60,6 +61,8 @@ typedef struct {
 
     float emitterX;
     float emitterY;
+
+    float scale;
 
     bool gravityFlipped;
     bool active;

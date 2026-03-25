@@ -80,6 +80,7 @@ void cube_gamemode(Player *player) {
     drag_particles.emitting = player->time_since_ground < 0.05f;
 
     drag_particles.gravityFlipped = player->upside_down;
+    drag_particles.scale = (player->mini ? 0.6f : 1.0f);
     
     
     if (player->on_ground) {
@@ -223,6 +224,7 @@ void ball_gamemode(Player *player) {
     drag_particles.emitting = player->on_ground || player->on_ceiling;
 
     drag_particles.gravityFlipped = player->upside_down;
+    drag_particles.scale = (player->mini ? 0.6f : 1.0f);
 
     // Jump
     if ((state.input.holdJump) && (player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        

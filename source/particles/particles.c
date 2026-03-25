@@ -29,6 +29,9 @@ static void copy_particle(ParticleData* d, int dst, int src) {
     d->dirX[dst] = d->dirX[src];
     d->dirY[dst] = d->dirY[src];
 
+    d->gravityX[dst] = d->gravityX[src];
+    d->gravityY[dst] = d->gravityY[src];
+
     d->radialAccel[dst] = d->radialAccel[src];
     d->tangentialAccel[dst] = d->tangentialAccel[src];
 
@@ -68,43 +71,44 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 
     // Position
     d->posx[i] = ps->emitterX +
-                 cfg->sourcePositionVariancex * rand_minus1_1();
+                 cfg->sourcePositionVariancex * rand_minus1_1() * ps->scale;
 
     d->posy[i] = ps->emitterY +
-                 cfg->sourcePositionVariancey * rand_minus1_1();
+                 cfg->sourcePositionVariancey * rand_minus1_1() * ps->scale;
 
     // Angle and speed
     float angle = C3D_AngleFromDegrees(cfg->angle +
                   cfg->angleVariance * rand_minus1_1());
     
 
-    float speed = cfg->speed +
-                  cfg->speedVariance * rand_minus1_1();
+    float speed = (cfg->speed +
+                  cfg->speedVariance * rand_minus1_1()) * ps->scale;
 
     float speed_y = ps->gravityFlipped ? -speed : speed;
 
     d->dirX[i] = cosf(angle) * speed;
     d->dirY[i] = sinf(angle) * speed_y;
 
-    d->gravityY[i] = ps->gravityFlipped ? -ps->gravityY : ps->gravityY;
+    d->gravityX[i] = ps->gravityX * ps->scale;
+    d->gravityY[i] = (ps->gravityFlipped ? -ps->gravityY : ps->gravityY) * ps->scale;
 
     // Radial / Tangential
     d->radialAccel[i] =
-        cfg->radialAcceleration +
-        cfg->radialAccelVariance * rand_minus1_1();
+        (cfg->radialAcceleration +
+        cfg->radialAccelVariance * rand_minus1_1()) * ps->scale;
 
     d->tangentialAccel[i] =
-        cfg->tangentialAcceleration +
-        cfg->tangentialAccelVariance * rand_minus1_1();
+        (cfg->tangentialAcceleration +
+        cfg->tangentialAccelVariance * rand_minus1_1()) * ps->scale;
 
     // Size
     float startSize = cfg->startParticleSize +
                       cfg->startParticleSizeVariance * rand_minus1_1();
-    startSize = fmaxf(0.0f, startSize);
+    startSize = fmaxf(0.0f, startSize * ps->scale);
 
     float endSize = cfg->finishParticleSize +
                     cfg->finishParticleSizeVariance * rand_minus1_1();
-    endSize = fmaxf(0.0f, endSize);
+    endSize = fmaxf(0.0f, endSize * ps->scale);
 
     d->size[i] = startSize;
 
@@ -165,10 +169,10 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 
     // Radial emitter (Mode B)
     if (cfg->emitterType == 1) {
-        float startRadius = cfg->maxRadius +
-                            cfg->maxRadiusVariance * rand_minus1_1();
+        float startRadius = (cfg->maxRadius +
+                            cfg->maxRadiusVariance * rand_minus1_1()) * ps->scale;
 
-        float endRadius = cfg->minRadius;
+        float endRadius = cfg->minRadius * ps->scale;
 
         d->radius[i] = startRadius;
 
@@ -259,7 +263,7 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
             tangentialX *= d->tangentialAccel[i];
             tangentialY *= d->tangentialAccel[i];
 
-            float ax = ps->gravityX + radialX + tangentialX;
+            float ax = d->gravityX[i] + radialX + tangentialX;
             float ay = d->gravityY[i] + radialY + tangentialY;
 
             d->dirX[i] += ax * dt;
@@ -330,6 +334,7 @@ void initParticleData(ParticleData* d, int capacity) {
     d->dirX = alloc_array(capacity);
     d->dirY = alloc_array(capacity);
 
+    d->gravityX = alloc_array(capacity);
     d->gravityY = alloc_array(capacity);
 
     d->radialAccel = alloc_array(capacity);
@@ -370,6 +375,7 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     ps->duration = cfg->duration;
     ps->emitterX = cfg->sourcePositionx;
     ps->emitterY = cfg->sourcePositiony;
+    ps->scale = 1.0f;
 
     ps->emitCounter = 0.0f;
 
@@ -397,6 +403,7 @@ void freeParticleData(ParticleData* d) {
     free(d->dirX);
     free(d->dirY);
 
+    free(d->gravityX);
     free(d->gravityY);
 
     free(d->radialAccel);
