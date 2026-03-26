@@ -83,6 +83,8 @@ typedef struct {
     KeyInput input;
 } GameState;
 
+#define CEILING_INVUL_TIME 0.15f
+
 extern GameState state;
 
 void set_intended_ceiling();

@@ -187,11 +187,11 @@ void flip_other_player(int current_player) {
         if (current_player == 0) {
             state.player2.upside_down = !state.player.upside_down;
             state.player2.vel_y /= -2;
-            state.player2.ceiling_inv_time = 0.1f;
+            state.player2.ceiling_inv_time = CEILING_INVUL_TIME;
         } else {
             state.player.upside_down = !state.player2.upside_down;
             state.player.vel_y /= -2;
-            state.player.ceiling_inv_time = 0.1f;
+            state.player.ceiling_inv_time = CEILING_INVUL_TIME;
         }
     }
 }
@@ -332,7 +332,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BLUE_GRAVITY_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
-                player->ceiling_inv_time = 0.1f;
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (player->upside_down) {
                     if (player->gamemode != GAMEMODE_PLAYER_BALL) MotionTrail_ResumeStroke(trail);
                     if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
@@ -349,7 +349,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case YELLOW_GRAVITY_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj)) {
-                player->ceiling_inv_time = 0.1f;
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
                 if (!player->upside_down) {
                     if (player->gamemode != GAMEMODE_PLAYER_BALL) MotionTrail_ResumeStroke(trail);
                     if (player->gamemode == GAMEMODE_DART) MotionTrail_AddWavePoint(wave_trail);
@@ -431,7 +431,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
                     if (player->gamemode == GAMEMODE_DART) player->vel_y *= 0.9f;
                     
-                    player->ceiling_inv_time = 0.1f;
+                    player->ceiling_inv_time = CEILING_INVUL_TIME;
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     flip_other_player(state.current_player ^ 1);
@@ -554,7 +554,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case DUAL_PORTAL:
             player->gravObj_id = obj;
             if (!GET_ACTIVATED(obj) && !state.dual) {
-                player->ceiling_inv_time = 0.1f;
+                player->ceiling_inv_time = CEILING_INVUL_TIME;
                 state.dual = true;
                 state.dual_portal_y = objects.y[obj];
                 setup_dual();
