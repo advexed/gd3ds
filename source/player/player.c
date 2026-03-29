@@ -850,9 +850,9 @@ void draw_hitbox(int obj) {
 
         draw_triangle_from_rect(rect, 3 - objects.orientation[obj], color);
     } else if (hitbox->type == COLLISION_CIRCLE) {
-        //float calc_radius = hitbox->width;
+        float calc_radius = hitbox->width;
 
-        //custom_circunference(calc_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
+        custom_circunference(calc_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
         //if (hitbox_type == HITBOX_SPECIAL && !objects.touch_triggered[obj]) return;
         get_corners(x, y, w, h, angle, rect);
@@ -874,8 +874,8 @@ void draw_player_hitbox(Player *player) {
     draw_square(rect, C2D_Color32(0x00, 0x00, 0xff, 0xff));
 
     // Circle hitbox
-    //float calc_radius = (player->width / 2) * SCALE;
-    //custom_circunference(calc_x_on_screen(player->x), calc_y_on_screen(player->y), calc_radius, C2D_Color32(0xff, 0x00, 0x00, 0xff), 2.f);
+    float calc_radius = (player->width / 2);
+    custom_circunference(calc_x_on_screen(player->x), calc_y_on_screen(player->y), calc_radius, C2D_Color32(0xff, 0x00, 0x00, 0xff), 2.f);
 
     // Unrotated hitbox
     get_corners(player->x, player->y, player->width, player->height, 0, rect);
