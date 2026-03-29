@@ -463,6 +463,7 @@ void game_loop() {
                 
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 6,  DEBUG_TEXT_SCALE, 0, "CPU: %6.2f%% (%6.2f%% %6.2f%%)", (C3D_GetProcessingTime() * 6) + processingTime, C3D_GetProcessingTime() * 6, processingTime);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 0, 18, DEBUG_TEXT_SCALE, 0, "GPU: %6.2f%%", drawingTime);
+                draw_text(bigFont_fontCharset, bigFont_sheet, 0, 30, DEBUG_TEXT_SCALE, 0, "Linear free: %d", linearSpaceFree());
 
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 42,  DEBUG_TEXT_SCALE, 0, "%d steps", steps);
                 draw_text(bigFont_fontCharset, bigFont_sheet, 180, 54,  DEBUG_TEXT_SCALE, 0, "Particle: %6.2f%%", particle_calc_time * 6);
