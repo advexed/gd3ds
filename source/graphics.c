@@ -1046,6 +1046,7 @@ void draw_objects() {
                 drawParticleSystem(&ship_secondary_particles[i], 0, 0, 1.f);
                 drawParticleSystem(&secondary_particles[i], 0, 0, 1.f);
                 drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&land_particles[i], 0, 0, 1.f);
             }
             drawParticleSystem(&brick_destroy_particles, 0, 0, 1.f);
             change_blending(false);

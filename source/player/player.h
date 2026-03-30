@@ -19,6 +19,8 @@ extern int frame_skipped;
 
 #define BURST_PARTICLES_DURATION 0.15f
 
+#define DRAG_PARTICLES_FLOOR_DURATION 0.1f
+
 typedef struct {
     int slope_id;
     float elapsed;
@@ -153,6 +155,7 @@ extern ParticleSystem ship_fire_particles[2];
 extern ParticleSystem ship_secondary_particles[2];
 extern ParticleSystem secondary_particles[2];
 extern ParticleSystem burst_particles[2];
+extern ParticleSystem land_particles[2];
 
 extern const float player_speeds[SPEED_COUNT];
 

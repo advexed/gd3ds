@@ -192,6 +192,9 @@ void game_loop() {
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
 
+    initParticleSystem(&land_particles[0], &land_effect);
+    initParticleSystem(&land_particles[1], &land_effect);
+
     initParticleSystem(&brick_destroy_particles, &glass_destroy_01);
     
     Color p1_not_white = get_white_if_black(p1_color);
@@ -201,9 +204,17 @@ void game_loop() {
     drag_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
     drag_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
 
+    drag_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
+    drag_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
+    drag_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+
     burst_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
     burst_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
     burst_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    burst_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
+    burst_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
+    burst_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
 
     secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
     secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
@@ -229,13 +240,13 @@ void game_loop() {
     ship_fire_particles[1].cfg.startColorGreen = 65.f / 255.f;
     ship_fire_particles[1].cfg.startColorBlue  = 0.f / 255.f;
 
-    drag_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    drag_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    drag_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    land_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
+    land_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
+    land_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
 
-    burst_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
-    burst_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
-    burst_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+    land_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
+    land_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
+    land_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
 
     exiting_level = false;
 
@@ -298,6 +309,7 @@ void game_loop() {
                 secondary_particles[i].emitting = false;
                 ship_secondary_particles[i].emitting = false;
                 burst_particles[i].emitting = false;
+                land_particles[i].emitting = false;
             }
             
             brick_destroy_particles.emitting = false;
@@ -400,6 +412,7 @@ void game_loop() {
                 updateParticleSystem(&ship_secondary_particles[i], delta);
                 updateParticleSystem(&secondary_particles[i], delta);
                 updateParticleSystem(&burst_particles[i], delta);
+                updateParticleSystem(&land_particles[i], delta);
             }
             updateParticleSystem(&brick_destroy_particles, delta);
             update_use_effects(delta);
@@ -515,6 +528,7 @@ void game_loop() {
         freeParticleData(&secondary_particles[i].data);
         freeParticleData(&ship_secondary_particles[i].data);
         freeParticleData(&burst_particles[i].data);
+        freeParticleData(&land_particles[i].data);
     }
 
     freeParticleData(&brick_destroy_particles.data);
