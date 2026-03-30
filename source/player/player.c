@@ -447,7 +447,7 @@ void run_player(Player *player) {
     }
     
     // Handle land particles
-    if (!state.old_player.on_ground && player->on_ground) {
+    if (player->gamemode != GAMEMODE_DART && !state.old_player.on_ground && player->on_ground) {
         land_particles[state.current_player].emitterX = player->x;
         land_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
         land_particles[state.current_player].gravityFlipped = player->upside_down;
