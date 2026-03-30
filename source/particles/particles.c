@@ -92,15 +92,6 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
     d->gravityX[i] = ps->gravityX * ps->scale;
     d->gravityY[i] = (ps->gravityFlipped ? -ps->gravityY : ps->gravityY) * ps->scale;
 
-    // Radial / Tangential
-    d->radialAccel[i] =
-        (cfg->radialAcceleration +
-        cfg->radialAccelVariance * rand_minus1_1()) * ps->scale;
-
-    d->tangentialAccel[i] =
-        (cfg->tangentialAcceleration +
-        cfg->tangentialAccelVariance * rand_minus1_1()) * ps->scale;
-
     // Size
     float startSize = cfg->startParticleSize +
                       cfg->startParticleSizeVariance * rand_minus1_1();
@@ -167,8 +158,19 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
     else
         d->deltaRotation[i] = 0;
 
-    // Radial emitter (Mode B)
-    if (cfg->emitterType == 1) {
+    if (cfg->emitterType == 0) {
+
+        // Radial / Tangential
+        d->radialAccel[i] =
+            (cfg->radialAcceleration +
+            cfg->radialAccelVariance * rand_minus1_1()) * ps->scale;
+
+        d->tangentialAccel[i] =
+            (cfg->tangentialAcceleration +
+            cfg->tangentialAccelVariance * rand_minus1_1()) * ps->scale;
+            
+
+    } else { // Radial emitter (Mode B)
         float startRadius = (cfg->maxRadius +
                             cfg->maxRadiusVariance * rand_minus1_1()) * ps->scale;
 
@@ -255,8 +257,8 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
 
     if (ps->cfg.emitterType == 0) { // Gravity Mode (Mode A)
         for (int i = 0; i < count; i++) {
-            float px = d->posx[i];
-            float py = d->posy[i];
+            float px = d->posx[i] - ps->emitterX;
+            float py = d->posy[i] - ps->emitterY;
 
             float radialX = 0.0f;
             float radialY = 0.0f;
