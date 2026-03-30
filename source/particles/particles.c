@@ -396,7 +396,7 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     // Emission rate
     if (cfg->particleLifespan > 0)
         ps->emissionRate = cfg->maxParticles / cfg->particleLifespan;
-    else
+    else 
         ps->emissionRate = 0;
         
     // Gravity
@@ -404,6 +404,10 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     ps->gravityY = cfg->gravityy;
 
     ps->cfg = *cfg;
+    if (cfg->particleLifespan <= 0) {
+        ps->cfg.particleLifespanVariance /= 2;
+        ps->cfg.particleLifespan = ps->cfg.particleLifespanVariance;
+    }
 }
 
 void freeParticleData(ParticleData* d) {
