@@ -36,6 +36,7 @@
 #include "player/player.h"
 #include "particles/circles.h"
 #include "menus/settings.h"
+#include "menus/external_levels.h"
 
 #define CITRA_TYPE 0x20000
 #define CITRA_VERSION 11
@@ -149,16 +150,34 @@ unsigned int frame_counter = 0;
 bool exiting_level = false;
 
 void game_loop() {
-    // TODO: make this support external levels
-    int returned = load_level(main_levels[curr_level_id].gmd_path);
-    level_info.level_name = main_levels[curr_level_id].level_name;
-    if (returned) {
-        printf("\x1b[9;1HFailed %d", returned);
-        game_state = STATE_LEVEL_SELECT;
-        return;
+    char *path;
+
+    if (state.custom_level) {
+        path = state.custom_level_path;
+    } else {
+        path = main_levels[curr_level_id].gmd_path;
+        level_info.level_name = main_levels[curr_level_id].level_name;
     }
 
-    returned = play_mp3(main_levels[curr_level_id].song_path, false);
+    int returned = load_level(path);
+    if (returned) {
+        printf("\x1b[9;1HFailed %d", returned);
+        game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
+        return;
+    }
+    
+    if (level_info.custom_song_id >= 0) {
+        char full_path[273];
+        snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, level_info.custom_song_id);
+        returned = play_mp3(full_path, false, level_info.song_offset);
+    } else {
+        if (state.custom_level) {
+            returned = play_mp3(main_levels[level_info.song_id].song_path, false, level_info.song_offset);
+        } else {
+            returned = play_mp3(main_levels[curr_level_id].song_path, false, 0);
+        }
+    }
+
     pause_playback_mp3();
 
     state.camera_x = 0;
@@ -598,7 +617,7 @@ void game_loop() {
     freeParticleData(&glitter_particles.data);
     unload_level();
 
-    game_state = STATE_LEVEL_SELECT;
+    game_state = (state.custom_level ? STATE_EXTERNAL_LEVELS : STATE_LEVEL_SELECT);
 }
 
 void game_assets_init() {
@@ -699,6 +718,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_GAME:
                 game_loop();
+                break;
+            case STATE_EXTERNAL_LEVELS:
+                external_levels_loop();
                 break;
             case STATE_EXIT:
                 exit = true;

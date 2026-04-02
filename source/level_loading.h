@@ -115,3 +115,7 @@ void unload_level();
 Section *get_or_create_section(int x, int y);
 bool obj_has_main(const GameObject *obj);
 bool obj_has_detail(const GameObject *obj);
+
+char *get_level_name(char *data_ptr);
+char *load_user_song(int id, size_t *out_size); 
+bool check_song(int id);

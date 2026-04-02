@@ -176,7 +176,7 @@ float mirror_angle(float angle, bool hflip, bool vflip)
 }
 
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
-    int col_channel = 0;
+    int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
@@ -448,7 +448,7 @@ void spawn_object_at(
 
         vo->obj = obj_game;
         vo->layer = 1;
-        vo->col_type = COLOR_TYPE_GLOW;
+        vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = 0.5f;
         vo->col_channel = get_glow_channel(id);
         viewable_objects_ptr[sprite_count] = vo;
@@ -675,8 +675,8 @@ int get_obj_opacity(int obj, float x) {
         case 96:
         case 309:
         case 311:
-        case 1747:
-        case 1748:
+        case 687:
+        case 688:
             if (objects.transition_applied[obj] == FADE_NONE) opacity = 255;
             break;
             
