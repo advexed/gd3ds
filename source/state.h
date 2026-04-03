@@ -87,6 +87,7 @@ typedef struct {
     PlayerHitboxTrail hitbox_trail_players[2][HITBOX_TRAIL_SIZE];
 
     KeyInput input;
+    KeyInput old_input;
 } GameState;
 
 #define CEILING_INVUL_TIME 0.15f

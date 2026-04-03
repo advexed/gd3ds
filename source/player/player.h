@@ -120,6 +120,10 @@ typedef struct {
     SlopeData slope_data;
 
     SnapData snap_data;
+
+    bool velocity_override;
+
+    float coyote_frames;
     
     int p1_trail_pos;
     P1Trail p1_trail_data[P1_TRAIL_LENGTH];

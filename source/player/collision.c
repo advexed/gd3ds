@@ -939,7 +939,7 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
-            clip += fabsf(player->vel_y) * STEPS_DT;
+            clip += fabsf(state.old_player.vel_y) * delta;
             
             if (player->slope_data.slope_id >= 0) {
                 return;

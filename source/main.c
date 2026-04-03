@@ -390,6 +390,7 @@ void game_loop() {
         bool buttonPressed = (yJump ? (kDown & KEY_Y) : (kDown & KEY_A));
         bool buttonHeld = (yJump ? (kHeld & KEY_Y) : (kHeld & KEY_A));
 
+        state.old_input = state.input;
         state.input.pressedJump = (buttonPressed || (in_bounds && (kDown & KEY_TOUCH))) == true;
         state.input.holdJump = (state.input.pressedJump || buttonHeld || (in_bounds && (kHeld & KEY_TOUCH))) == true;
         
