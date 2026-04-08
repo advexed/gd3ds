@@ -943,23 +943,6 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
 
             clip += fabsf(state.old_player.vel_y) * delta;
 
-            float bottom = gravBottom(player);
-            
-            if (player->slope_data.slope_id >= 0) {
-                    return;
-            }
-            
-            for (size_t i = 0; i < potential_slopes[state.current_player]; i++) {
-                int potential_slope = potential_slopes_buffer[state.current_player][i];
-
-                unsigned char orient = grav_slope_orient(potential_slope, player);
-                float block_comp = orient < 2 ? obj_gravTop(player, obj) : obj_gravBottom(player, obj);
-                float slope_comp = orient < 2 ? obj_gravBottom(player, potential_slope) : obj_gravTop(player, potential_slope);
-
-                if (block_comp - slope_comp < 2) {
-                    return;
-                }
-            }
             
             if (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1) {
                 // Only do the funny grav snap if player is touching a gravity object and internal hitbox is touching block
@@ -987,8 +970,30 @@ void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
                     // Not a brick, die
                     state.dead = true;
                 }
+
+                return;
+            }
+            
+            if (player->slope_data.slope_id >= 0) {
+                return;
+            }
+            
+            float bottom = gravBottom(player);
+              
+            for (size_t i = 0; i < potential_slopes[state.current_player]; i++) {
+                int potential_slope = potential_slopes_buffer[state.current_player][i];
+
+                unsigned char orient = grav_slope_orient(potential_slope, player);
+                float block_comp = orient < 2 ? obj_gravTop(player, obj) : obj_gravBottom(player, obj);
+                float slope_comp = orient < 2 ? obj_gravBottom(player, potential_slope) : obj_gravTop(player, potential_slope);
+
+                if (block_comp - slope_comp < 2) {
+                    return;
+                }
+            }
+
             // Check snap for player bottom
-            } else if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_DART) {
+            if (obj_gravTop(player, obj) - bottom <= clip && player->vel_y <= 0 && player->gamemode != GAMEMODE_DART) {
                 player->y = grav(player, obj_gravTop(player, obj)) + grav(player, player->height / 2);
                 if (player->vel_y <= 0) player->vel_y = 0;
                 player->on_ground = true;
