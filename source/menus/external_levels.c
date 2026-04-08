@@ -35,7 +35,9 @@ static bool start_level = false;
 static bool first_time_loaded = true;
 
 static UIScreen screen;
+static UIScreen screen_top;
 static UIElement *bg_gradient;
+static UIElement *bg_gradient_top;
 static UIElement *list;
 
 UIElement texts[UI_LIST_MAX_ITEMS];
@@ -113,6 +115,8 @@ void external_levels_loop() {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
     C2D_SceneBegin(bot);
     C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
+    C2D_SceneBegin(top);
+    C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
     C2D_Fade(0);
     draw_text(bigFont_fontCharset, bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
     C3D_FrameEnd(0);
@@ -122,12 +126,15 @@ void external_levels_loop() {
     if (first_time_loaded) {
         ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/external_levels.txt");
         bg_gradient = ui_get_element_by_tag(&screen, "gradient");
+        ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/external_levels_top.txt");
+        bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient_top");
         list = ui_get_element_by_tag(&screen, "list");
         first_time_loaded = false;
     }
 
-    ui_image_set_tint(bg_gradient, C2D_Color32(167, 167, 167, 255));
-    
+    ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
+    ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
+
     load_level_folder(current_path);
 
     set_fade_status(FADE_STATUS_IN);
@@ -172,7 +179,9 @@ void external_levels_loop() {
             // Top screen
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
             C2D_SceneBegin(top);
+            draw_fade();
 
+            ui_screen_draw(&screen_top);
             C2D_ViewReset();
             C3D_FrameEnd(0);
         } while (handle_fading());

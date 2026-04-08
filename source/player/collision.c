@@ -206,7 +206,6 @@ void set_dual_bounds() {
                  dual_gamemode_heights[state.player2.gamemode]);
 
     float in_block_y = fmodf(state.dual_portal_y, 30);
-
     int ground_offset = (ceilf(((float) height + 1) / 2) - 1) * 30;
     state.ground_y = fmaxf(0, floorf((state.dual_portal_y - ground_offset) / 30.f)) * 30;
 
@@ -617,7 +616,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 150) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + 240;
-                set_intended_ceiling();
 
                 if (player->gamemode != GAMEMODE_PLAYER_BALL) {
                     player->ball_rotation_speed = -BALL_SLOW_ROTATION;
@@ -631,8 +629,8 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             player->vel_y /= 2;
                             break;
                     }
-                    
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
+                    set_intended_ceiling();
                     if (state.dual) {
                         set_dual_bounds();
                     } 
@@ -773,14 +771,14 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 SET_ACTIVATED(obj, true);
 
-                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_use_effect, GFX_TOP);
+                UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_use_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
                     effect->def.colorG = 190 / 255.f;
                     effect->def.colorB = 0 / 255.f;
                 }
 
-                UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &orb_collide_effect, GFX_TOP);
+                UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &coin_radius_effect, GFX_TOP);
                 if (effect2) {
                     effect2->def.colorR = 255 / 255.f;
                     effect2->def.colorG = 190 / 255.f;

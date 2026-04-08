@@ -1,4 +1,8 @@
 bggradient tag="gradient"
 
+image x=36 y=205 id=178
+image x=284 y=205 id=178 sx=-1.0
+
+button x=20 y=20 id=8 action="exit"
 list x=160 y=120 w=200 h=140 tag="list"
-button x=260 y=40 id=200 scale=0.5 action="go_back"
+button x=260 y=40 id=200 scale=0.7 action="go_back"
