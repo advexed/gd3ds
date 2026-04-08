@@ -54,6 +54,8 @@ extern const UseEffectDefinition speed_collide_effect;
 extern const UseEffectDefinition portal_use_effect;
 extern const UseEffectDefinition death_effect;
 extern const UseEffectDefinition tap_effect;
+extern const UseEffectDefinition coin_use_effect;
+extern const UseEffectDefinition coin_radius_effect;
 
 UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *def, int screen);
 void update_use_effects(float delta, int screen);

@@ -24,16 +24,16 @@ const UseEffectDefinition orb_use_effect = {
     .colorR = 1, 
     .colorG = 1,
     .colorB = 0,
-    .duration = 0.45f,
-    .start_opacity = 0.01f,
+    .duration = 0.4f,
+    .start_opacity = 0.05f,
     .end_opacity = 1,
-    .start_rad = 35,
-    .end_rad = 5,
+    .start_rad = 32,
+    .end_rad = 3.2f,
     .hollow = false,
     .trifading = true,
     .start_opacity_ease = EASE_OUT,
     .end_opacity_ease = EASE_LINEAR,
-    .start_rad_ease = EASE_LINEAR,
+    .start_rad_ease = EASE_IN,
     .end_rad_ease = EASE_LINEAR,
 };
 const UseEffectDefinition portal_use_effect = {
@@ -69,7 +69,6 @@ const UseEffectDefinition orb_collide_effect = {
     .end_rad_ease = EASE_OUT,
     .line_thickness = 1.f
 };
-
 const UseEffectDefinition speed_collide_effect = {
     .colorR = 1, 
     .colorG = 1,
@@ -87,7 +86,6 @@ const UseEffectDefinition speed_collide_effect = {
     .end_rad_ease = EASE_OUT,
     .line_thickness = 2.0f
 };
-
 const UseEffectDefinition death_effect = {
     .colorR = 1, 
     .colorG = 1,
@@ -104,7 +102,6 @@ const UseEffectDefinition death_effect = {
     .start_rad_ease = EASE_OUT,
     .end_rad_ease = EASE_OUT,
 };
-
 const UseEffectDefinition tap_effect = {
     .colorR = 1, 
     .colorG = 1,
@@ -120,6 +117,39 @@ const UseEffectDefinition tap_effect = {
     .end_opacity_ease = EASE_LINEAR,
     .start_rad_ease = EASE_OUT,
     .end_rad_ease = EASE_OUT,
+};
+const UseEffectDefinition coin_use_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 0,
+    .duration = 0.4f,
+    .start_opacity = 0.01f,
+    .end_opacity = 1,
+    .start_rad = 32,
+    .end_rad = 3.2f,
+    .hollow = false,
+    .trifading = true,
+    .start_opacity_ease = EASE_OUT,
+    .end_opacity_ease = EASE_LINEAR,
+    .start_rad_ease = EASE_IN,
+    .end_rad_ease = EASE_LINEAR,
+};
+const UseEffectDefinition coin_radius_effect = {
+    .colorR = 1, 
+    .colorG = 1,
+    .colorB = 1,
+    .duration = 0.35f,
+    .start_opacity = .7f,
+    .end_opacity = 0,
+    .start_rad = 0,
+    .end_rad = 65,
+    .hollow = true,
+    .trifading = false,
+    .start_opacity_ease = EASE_IN,
+    .end_opacity_ease = EASE_OUT,
+    .start_rad_ease = EASE_OUT,
+    .end_rad_ease = EASE_OUT,
+    .line_thickness = 1.f
 };
 
 UseEffect use_effects_top[MAX_USE_EFFECTS];
