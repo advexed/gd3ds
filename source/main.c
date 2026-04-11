@@ -183,7 +183,7 @@ void game_loop() {
     }
     
 
-    if (level_info.custom_song_id >= 0) {
+    if (level_info.custom_song_id > 0) {
         char full_path[273];
         snprintf(full_path, sizeof(full_path), "%s/%d.mp3", USER_SONGS_DIR, level_info.custom_song_id);
         song_loaded = play_mp3(full_path, false, level_info.song_offset);

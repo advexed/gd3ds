@@ -616,6 +616,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             if (!GET_ACTIVATED(obj)) {
                 state.ground_y = fmaxf(0, ip1_ceilf((objects.y[obj] - 150) / 30.f)) * 30;
                 state.ceiling_y = state.ground_y + 240;
+                set_intended_ceiling();
 
                 if (player->gamemode != GAMEMODE_PLAYER_BALL) {
                     player->ball_rotation_speed = -BALL_SLOW_ROTATION;
@@ -630,7 +631,6 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             break;
                     }
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
-                    set_intended_ceiling();
                     if (state.dual) {
                         set_dual_bounds();
                     } 
