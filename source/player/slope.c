@@ -9,6 +9,7 @@
 #include "fonts/bigFont.h"
 #include "menus/components/ui_screen.h"
 #include "math_helpers.h"
+#include "main.h"
 
 const float falls[SPEED_COUNT] = {
     226.044054,
@@ -545,7 +546,7 @@ void slope_collide(int obj, Player *player) {
                 }
             }
 
-            if (state.old_player.slope_data.slope_id < 0 && player->coyote_slope.slope_id < 0) {
+            if (state.old_player.slope_data.slope_id < 0) {
                 player->slope_data.elapsed = 0.f;
             }
 
@@ -560,6 +561,7 @@ void slope_collide(int obj, Player *player) {
                     player->slope_data.elapsed = player->timeElapsed;
                 }
             }
+            output_log("elapsed %.2f\n", player->slope_data.elapsed);
         } 
     }
 }

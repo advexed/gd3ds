@@ -138,7 +138,7 @@ void cube_gamemode(Player *player) {
             int orient = grav_slope_orient(slope_data.slope_id, player);
             if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_UP) {
                 float time = clampf(10 * (player->timeElapsed - slope_data.elapsed), 0.4f, 1.0f);
-                set_p_velocity(player, 0.25f * time * slopeHeights[state.speed] + cube_jump_heights[state.speed], state.old_input.holdJump);
+                set_p_velocity(player, 0.25f * time * slopeHeights[state.speed] + cube_jump_heights[state.speed], false);
             } else {
                 set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
             }
