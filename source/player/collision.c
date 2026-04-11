@@ -172,18 +172,22 @@ float snap_player(Vec2D diff, Player *player) {
 
 void trySnap(int block, Player *player) {
     Vec2D diff;
-    diff.x = objects.x[block] - objects.x[player->snap_data.object_id];
-    diff.y = objects.y[block] - objects.y[player->snap_data.object_id];
-    diff.y = grav(player, diff.y);
-    float threshold = snap_player(diff, player);
-    if (threshold > 0) {
-        player->x = clampf(
-            objects.x[block] + player->snap_data.player_snap_diff,
-            player->x - threshold,
-            player->x + threshold
-        );
+    int snap_block = player->snap_data.object_id;
 
-        player->snap_data.snapped_obj = block;
+    if (snap_block >= 0) {
+        diff.x = objects.x[block] - objects.x[snap_block];
+        diff.y = objects.y[block] - objects.y[snap_block];
+        diff.y = grav(player, diff.y);
+        float threshold = snap_player(diff, player);
+        if (threshold > 0) {
+            player->x = clampf(
+                objects.x[block] + player->snap_data.player_snap_diff,
+                player->x - threshold,
+                player->x + threshold
+            );
+
+            player->snap_data.snapped_obj = block;
+        }
     }
 }
 

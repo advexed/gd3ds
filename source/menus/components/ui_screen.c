@@ -3,7 +3,6 @@
 #include "ui_button.h"
 #include "ui_image.h"
 #include "ui_label.h"
-#include "ui_label_aller.h"
 #include "ui_screen.h"
 #include "ui_checkbox.h"
 #include "ui_window.h"
@@ -292,6 +291,8 @@ void ui_load_screen(UIScreen* screen,
 
         int index = 1, color_index = 0, gamemode = 0;
 
+        int font = 0;
+
         // Some strings
         char actionName[64] = {0};
         char text[256] = {0};
@@ -368,6 +369,8 @@ void ui_load_screen(UIScreen* screen,
                 color_index = atoi(value);
             } else if (strcmp(key, "max_value") == 0) {
                 max_value = atoi(value);
+            } else if (strcmp(key, "font") == 0) {
+                font = atoi(value);
             }
         }
 
@@ -389,10 +392,7 @@ void ui_load_screen(UIScreen* screen,
                 ui_create_image(x, y, id, sheet, sx, sy, tag);
         } else if (strcmp(type, "label") == 0) {
             screen->elements[screen->count++] =
-                ui_create_label(x, y, scale, text, align, tag);
-        } else if (strcmp(type, "label_aller") == 0) {
-            screen->elements[screen->count++] =
-                ui_create_label_aller(x, y, scale, text, align, tag);
+                ui_create_label(x, y, scale, text, font, align, tag);
         } else if (strcmp(type, "checkbox") == 0) {
             screen->elements[screen->count++] =
                 ui_create_checkbox(

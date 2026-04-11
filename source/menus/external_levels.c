@@ -9,7 +9,6 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_label_aller.h"
 #include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
@@ -71,7 +70,7 @@ void load_level_folder(char *folder) {
     char path[256];
     strncpy(path, current_path, 256);
     truncate_filename(path, 30);
-    strncpy(path_label->label_aller.text, path, 256);
+    strncpy(path_label->label.text, path, 256);
     int count = 0;
     FileOrFolder *entries = load_folder(folder, &count);
     char level_name[256];
@@ -94,7 +93,7 @@ void load_level_folder(char *folder) {
             }
         }
     } else {
-        texts[0] = ui_create_label(0, 0, 0.5f, "No levels", 0.5f, NULL);
+        texts[0] = ui_create_label(0, 0, 0.5f, "No levels", 0, 0.5f, NULL);
         ui_list_add(list, &texts[0]);
     }
 
@@ -111,7 +110,6 @@ static void action_go_back(UIElement *e) {
 static void open_folder(UIElement *e) {
     strncpy(current_path, e->external_level_card.path, 256);
     load_level_folder(current_path);
-
 }
 
 static UIAction actions[] = {
@@ -126,7 +124,7 @@ void external_levels_loop() {
     C2D_SceneBegin(top);
     C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
     C2D_Fade(0);
-    draw_text(bigFont_fontCharset, bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
     C3D_FrameEnd(0);
 
     start_level = false;

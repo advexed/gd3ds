@@ -173,6 +173,9 @@ void init_variables() {
     current_fading_effect = FADE_NONE;
     memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
     memset(&state.player.snap_data, 0, sizeof(SnapData));
+    state.player.snap_data.snapped_obj = -1;
+    state.player.snap_data.object_id = -1;
+
     state.player.p1_trail_pos = 0;
     p1_trail = false;
     state.death_timer = 0.f;

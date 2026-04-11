@@ -20,5 +20,5 @@ typedef struct {
     unsigned int count;
 } Charset;
 
-void draw_text(Charset font, C2D_SpriteSheet sheet, const float x, const float y, const float scale, float alignment, const char *text, ...);
-float get_text_length(Charset font, const float zoom_x, const char *text);
+void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scale, float alignment, const char *text, ...);
+float get_text_length(const Charset *font, const float zoom_x, const char *text);

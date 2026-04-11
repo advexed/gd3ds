@@ -6,10 +6,10 @@
 #include "fonts/bigFont.h"
 #include <stdarg.h>
 
-const Glyph *get_glyph(Charset font, char character) {
-    for (int i = 0; i < font.count; i++) {
-        if (character == font.glyphs[i].id) {
-            return &font.glyphs[i];
+const Glyph *get_glyph(const Charset *font, char character) {
+    for (int i = 0; i < font->count; i++) {
+        if (character == font->glyphs[i].id) {
+            return &font->glyphs[i];
         }
     }
     // If not found and a lowercase letter, convert to uppercase
@@ -17,9 +17,9 @@ const Glyph *get_glyph(Charset font, char character) {
         character -= 32;
 
         // Search again
-        for (int i = 0; i < font.count; i++) {
-            if (character == font.glyphs[i].id) {
-                return &font.glyphs[i];
+        for (int i = 0; i < font->count; i++) {
+            if (character == font->glyphs[i].id) {
+                return &font->glyphs[i];
             }
         }
     }
@@ -27,7 +27,7 @@ const Glyph *get_glyph(Charset font, char character) {
     return NULL;
 }
 
-float get_text_length(Charset font, const float zoom_x, const char *text) {
+float get_text_length(const Charset *font, const float zoom_x, const char *text) {
     float text_length = 0;
     int size = strlen(text);
     for (int i = 0; i < size; i++) {
@@ -42,7 +42,7 @@ float get_text_length(Charset font, const float zoom_x, const char *text) {
     return text_length;
 }
 
-void draw_text(Charset font, C2D_SpriteSheet sheet, const float x, const float y, const float scale, float alignment, const char *text, ...) {
+void draw_text(const Charset *font, C2D_SpriteSheet *sheet, const float x, const float y, const float scale, float alignment, const char *text, ...) {
     if (!text || !sheet) {
         return;
     }
@@ -78,7 +78,7 @@ void draw_text(Charset font, C2D_SpriteSheet sheet, const float x, const float y
 
             if (index >= 0) { 
                 // Draw glyph so its center is at (final_x, final_y)
-                C2D_SpriteFromSheet(&sprite, sheet, index);
+                C2D_SpriteFromSheet(&sprite, *sheet, index);
                 C3D_TexSetFilter(sprite.image.tex, GPU_LINEAR, GPU_LINEAR);
                 C2D_SpriteSetPos(&sprite, final_x, final_y);
                 C2D_SpriteSetScale(&sprite, scale, scale);

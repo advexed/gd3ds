@@ -11,7 +11,6 @@ typedef enum {
     UI_BUTTON,
     UI_IMAGE,
     UI_LABEL,
-    UI_LABEL_ALLER,
     UI_CHECKBOX,
     UI_WINDOW,
     UI_TEXTBOX,
@@ -84,13 +83,8 @@ typedef struct {
     char text[256];
     float alignment;
     float scale;
+    int font;
 } UILabelData;
-
-typedef struct {
-    char text[256];
-    float alignment;
-    float scale;
-} UILabelAllerData;
 
 typedef struct {
     bool hovered;
@@ -219,7 +213,6 @@ struct UIElement {
         UIImageData image;
         UIButtonData button;
         UILabelData label;
-        UILabelAllerData label_aller;
         UICheckBoxData checkbox;
         UIWindowData window;
         UITextbox textbox;

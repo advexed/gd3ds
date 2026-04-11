@@ -71,7 +71,7 @@ static void ui_window_button_draw(UIElement* e) {
     draw_9_slice(e->window_button.window.atlas, e->x, e->y, e->w * scale, e->h * scale, e->window_button.window.border, e->window_button.window.color);
 
     // Get text length in pixels
-    float length = get_text_length(bigFont_fontCharset, 1 / 0.85f, e->window_button.text);
+    float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->window_button.text);
 
     // Resize it to fit the button bounds
     float txt_scale;
@@ -81,7 +81,7 @@ static void ui_window_button_draw(UIElement* e) {
         txt_scale = scale * 0.85f;
     }
 
-    draw_text(bigFont_fontCharset, bigFont_sheet, e->x, e->y, txt_scale, 0.5f, "%s", e->window_button.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, txt_scale, 0.5f, "%s", e->window_button.text);
 }
 
 void ui_window_button_set_style(UIElement *e, int style) {

@@ -30,7 +30,7 @@ static void ui_textbox_draw(UIElement* e) {
     draw_9_slice(e->textbox.atlas, e->x, e->y, e->w, e->h, e->textbox.border, C2D_Color32(0, 0, 0, 127));
     
     // Get text length in pixels
-    float length = get_text_length(bigFont_fontCharset, 1.f, e->textbox.text);
+    float length = get_text_length(&bigFont_fontCharset, 1.f, e->textbox.text);
 
     // Resize it to fit the button bounds
     float txt_scale;
@@ -40,7 +40,7 @@ static void ui_textbox_draw(UIElement* e) {
         txt_scale = 1.0f;
     }
 
-    draw_text(bigFont_fontCharset, bigFont_sheet, e->x - e->w / 2 + (TEXTBOX_MARGIN / 2), e->y, txt_scale, 0.f, "%s", e->textbox.text);
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x - e->w / 2 + (TEXTBOX_MARGIN / 2), e->y, txt_scale, 0.f, "%s", e->textbox.text);
 }
 
 UIElement ui_create_textbox(

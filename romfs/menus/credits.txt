@@ -7,12 +7,12 @@ button x=35 y=35 id=31 scale=0.8 action="exit"
 label x=160 y=60 text="Credits" scale=0.8 align=CENTER
 
 label x=50 y=90 text="AleFunky" scale=0.5
-label_aller x=131 y=97 text="- Lead Developer" scale=0.7
+label x=131 y=97 font=1 text="- Lead Developer" scale=0.7
 label x=50 y=110 text="advexed" scale=0.5
-label_aller x=121 y=117 text="- Menus and VFX" scale=0.7
+label x=121 y=117 font=1 text="- Menus and VFX" scale=0.7
 label x=50 y=130 text="nittynatty" scale=0.5 
-label_aller x=145 y=137 text="- VFX" scale=0.7
+label x=145 y=137 font=1 text="- VFX" scale=0.7
 label x=50 y=150 text="orionconstel" scale=0.5 
-label_aller x=165 y=157 text="- Concepts and Menus" scale=0.7
+label x=165 y=157 font=1 text="- Concepts and Menus" scale=0.7
 label x=50 y=170 text="camila314" scale=0.5 
-label_aller x=140 y=177 text="- Pathfinder Mod (Physics)" scale=0.7
+label x=140 y=177 font=1 text="- Pathfinder Mod (Physics)" scale=0.7
