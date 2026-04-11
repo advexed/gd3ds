@@ -202,7 +202,7 @@ void external_levels_loop() {
         }
 
         if (exit_flag) {
-            game_state = STATE_MAIN_MENU;
+            game_state = STATE_CREATOR_MENU;
             break;
         }
     }
