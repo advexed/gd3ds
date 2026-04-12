@@ -9,7 +9,6 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_label_aller.h"
 #include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
@@ -61,7 +60,7 @@ void creator_menu_loop() {
     C2D_SceneBegin(top);
     C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
     C2D_Fade(0);
-    draw_text(bigFont_fontCharset, bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
+    draw_text(&bigFont_fontCharset, &bigFont_sheet, 310, SCREEN_HEIGHT - 10, 0.5f, 1.0f, "Loading...");
     C3D_FrameEnd(0);
 
     exit_flag = false;
