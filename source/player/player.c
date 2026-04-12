@@ -444,9 +444,7 @@ void ufo_gamemode(Player *player) {
 void wave_gamemode(Player *player) {
     trail->positionR = (Vec2){player->x, player->y};  
     trail->startingPositionInitialized = true;
-    
-    wave_trail->positionR = (Vec2){player->x, player->y};  
-    wave_trail->startingPositionInitialized = true;
+ 
     if (player->cutscene_timer == 0) wave_trail->opacity = 1.f;
 
     if (player->buffering_state == BUFFER_READY) player->buffering_state = BUFFER_END;
@@ -455,9 +453,6 @@ void wave_gamemode(Player *player) {
     player->gravity = 0;
 
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
-    if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling || player->mini != state.old_player.mini || player->upside_down != state.old_player.upside_down) {
-        MotionTrail_AddWavePoint(wave_trail);
-    }
 }
 
 void run_player(Player *player) {
@@ -636,6 +631,17 @@ void run_player(Player *player) {
         slope_calc(player->slope_data.slope_id, player);
     }
 
+    
+
+    if (player->gamemode == GAMEMODE_DART) {
+        wave_trail->positionR = (Vec2){player->x, player->y};  
+        wave_trail->startingPositionInitialized = true;
+        
+        if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
+            MotionTrail_AddWavePoint(wave_trail);
+        }
+    }
+
     if (player->gamemode == GAMEMODE_SHIP) rotate_fly(player, 0.15f);
     if (player->gamemode == GAMEMODE_DART) rotate_fly(player, player->mini ? 0.4f : 0.25f);
 
@@ -690,8 +696,9 @@ void handle_player(Player *player) {
     
     if (state.noclip) state.dead = false;
     
-    player->delta_y = player->y - state.old_player.y;
+    do_ball_reflection();
 
+    player->delta_y = player->y - state.old_player.y;
     
     u64 end_player = svcGetSystemTick();
     ticks = end_player - start_player;
@@ -783,6 +790,7 @@ void draw_p1_trail(Player *player) {
         }
     }
 }
+
 
 void draw_player(Player *player) {
     // Don't draw player if dead

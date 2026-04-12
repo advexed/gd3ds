@@ -87,6 +87,7 @@ extern int potential_slopes_buffer[2][MAX_COLLIDED_OBJECTS];
 extern int potential_slopes[2];
 
 void setup_dual();
+void do_ball_reflection();
 
 void collide_with_objects(Player *player);
 bool intersect(float x1, float y1, float w1, float h1, float angle1,

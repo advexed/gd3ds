@@ -205,6 +205,52 @@ void flip_other_player(int current_player) {
     }
 }
 
+void do_ball_reflection() {
+    Player *player_1 = &state.player;
+    Player *player_2 = &state.player2;
+    if (state.dual && player_1->gamemode == GAMEMODE_PLAYER_BALL && player_2->gamemode == GAMEMODE_PLAYER_BALL) {
+        if (player_1->upside_down == player_2->upside_down) {
+            bool ballsIntersecting = intersect(
+                player_1->x, player_1->y, player_1->width, player_1->height, 0,
+                player_2->x, player_2->y, player_2->width, player_2->height, 0
+            );
+
+            if (ballsIntersecting) {
+                int current_player = state.current_player;
+                if (player_1->on_ground || player_1->on_ceiling) {
+                    state.current_player = 0;
+
+                    UseEffect *effect = add_use_effect(player_1->x, player_1->y, -1, &orb_collide_effect, GFX_TOP);
+                    if (effect) {
+                        Color p1_white = get_white_if_black(p1_color);
+                        effect->def.colorR = p1_white.r / 255.f;
+                        effect->def.colorG = p1_white.g / 255.f;
+                        effect->def.colorB = p1_white.b / 255.f;
+                    }
+
+                    player_2->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player_2->gamemode][player_2->mini];
+                    player_2->upside_down ^= 1;
+                } else if (player_2->on_ground || player_2->on_ceiling) {
+                    state.current_player = 1;
+
+                    UseEffect *effect = add_use_effect(player_2->x, player_2->y, -1, &orb_collide_effect, GFX_TOP);
+                    if (effect) {
+                        Color p2_white = get_white_if_black(p2_color);
+                        effect->def.colorR = p2_white.r / 255.f;
+                        effect->def.colorG = p2_white.g / 255.f;
+                        effect->def.colorB = p2_white.b / 255.f;
+                    }
+
+
+                    player_1->vel_y = jump_heights_table[state.speed][JUMP_BLUE_PAD][player_1->gamemode][player_1->mini];
+                    player_1->upside_down ^= 1;
+                }
+                state.current_player = current_player;
+            }
+        }   
+    }
+}
+
 void set_dual_bounds() {
     int height = MAX(dual_gamemode_heights[state.player.gamemode],
                  dual_gamemode_heights[state.player2.gamemode]);
