@@ -1190,7 +1190,7 @@ void collide_with_objects(Player *player) {
     
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
-            Section *sec = get_or_create_section(sx + dx, sy + dy);
+            Section *sec = get_section(sx + dx, sy + dy);
             for (int i = 0; i < sec->object_count; i++) {
                 int obj = sec->objects[i];
                 const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;

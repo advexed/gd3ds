@@ -131,8 +131,8 @@ void handle_card_movement() {
             update_level_stars(curr_level_id, 0);
 
             ui_run_func_on_tag(&screen, "level_card_2", disable_card_2);
-            ui_set_pos_on_tag(&screen, 160, 90, "level_card");
-            ui_set_pos_on_tag(&screen, 160, 90, "level_card_2");
+            ui_set_pos_on_tag(&screen, 160, LEVEL_CARD_Y_POS, "level_card");
+            ui_set_pos_on_tag(&screen, 160, LEVEL_CARD_Y_POS, "level_card_2");
             scroll_dir = 0;
             return;
         }
@@ -141,8 +141,8 @@ void handle_card_movement() {
         float value = 160 + (fade_value) * scroll_dir;
         anim_time += 0.016666f;
 
-        ui_set_pos_on_tag(&screen, value, 90, "level_card");
-        ui_set_pos_on_tag(&screen, value - 320 * scroll_dir, 90, "level_card_2");
+        ui_set_pos_on_tag(&screen, value, LEVEL_CARD_Y_POS, "level_card");
+        ui_set_pos_on_tag(&screen, value - 320 * scroll_dir, LEVEL_CARD_Y_POS, "level_card_2");
     }
 }
 
@@ -154,7 +154,7 @@ void action_move_right(UIElement* e) {
     
     if (curr_level_id >= MAIN_LEVELS_NUM) curr_level_id = 0;
     
-    ui_set_pos_on_tag(&screen, 160, 90, "level_card");
+    ui_set_pos_on_tag(&screen, 160, LEVEL_CARD_Y_POS, "level_card");
     ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
     ui_run_func_on_tag(&screen, "level_card_2", level_card_move_right);
     
@@ -177,7 +177,7 @@ void action_move_left(UIElement* e) {
 
     if (curr_level_id < 0) curr_level_id = MAIN_LEVELS_NUM-1;
 
-    ui_set_pos_on_tag(&screen, 160, 90, "level_card");
+    ui_set_pos_on_tag(&screen, 160, LEVEL_CARD_Y_POS, "level_card");
     ui_run_func_on_tag(&screen, "level_card_2", enable_card_2);
     ui_run_func_on_tag(&screen, "level_card_2", level_card_move_left);
 

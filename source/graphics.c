@@ -620,11 +620,11 @@ int get_object_layers(int id) {
     int count = 0;
     if (id < 0 || id >= GAME_OBJECT_COUNT) return 0;
 
-    const GameObject obj = game_objects[id];
-    if (obj.texture >= 0) count++;
+    const GameObject *obj = &game_objects[id];
+    if (obj->texture >= 0) count++;
     
-    for (size_t c = 0; c < obj.child_count; c++) {
-        if (obj.children[c].texture >= 0) count++;
+    for (size_t c = 0; c < obj->child_count; c++) {
+        if (obj->children[c].texture >= 0) count++;
     }
     return count;
 }
@@ -944,7 +944,7 @@ void create_objects() {
             if (sx < 0) continue;
             if (sy < 0) continue;
 
-            Section *sec = get_or_create_section(sx, sy);
+            Section *sec = get_section(sx, sy);
             for (int i = 0; i < sec->object_count; i++) {
                 int obj = sec->objects[i];
                 

@@ -18,6 +18,8 @@
 
 ObjectsArray objects = { 0 };
 
+Section empty_section = { 0 };
+
 Section *section_hash[SECTION_HASH_SIZE] = {0};
 
 int channelCount = 0;
@@ -27,6 +29,16 @@ LoadedLevelInfo level_info;
 
 static inline unsigned int section_hash_func(unsigned int x, unsigned int y) {
     return ((unsigned int)x * 73856093u ^ (unsigned int)y * 19349663u) & (SECTION_HASH_SIZE - 1);
+}
+
+Section *get_section(int x, int y) {
+    unsigned int h = section_hash_func(x, y);
+    Section *sec = section_hash[h];
+    while (sec) {
+        if (sec->x == x && sec->y == y) return sec;
+        sec = sec->next;
+    }
+    return &empty_section;
 }
 
 Section *get_or_create_section(int x, int y) {

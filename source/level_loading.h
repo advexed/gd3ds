@@ -111,6 +111,7 @@ int load_level(char *path);
 void reload_level();
 void unload_level();
 
+Section *get_section(int x, int y);
 Section *get_or_create_section(int x, int y);
 bool obj_has_main(const GameObject *obj);
 bool obj_has_detail(const GameObject *obj);

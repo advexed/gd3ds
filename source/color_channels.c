@@ -298,7 +298,7 @@ void handle_triggers() {
             int sec_y = sy;
             if (sec_x < 0) continue;
 
-            Section *sec = get_or_create_section(sec_x, sec_y);
+            Section *sec = get_section(sec_x, sec_y);
             for (int i = 0; i < sec->object_count; i++) {
                 int obj = sec->objects[i];
                 
