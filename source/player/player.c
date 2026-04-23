@@ -927,6 +927,8 @@ void draw_square(Vec2D rect[4], uint32_t color) {
 }
 
 void draw_hitbox(int obj) {
+    if (!is_valid_object(objects.id[obj])) return;
+
     const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
 
     if (!hitbox) return;

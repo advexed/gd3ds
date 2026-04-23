@@ -61,6 +61,6 @@ typedef struct {
 } GameObject;
 
 #define TEXTURE_COUNT 883
-#define GAME_OBJECT_COUNT 1912
+#define GAME_OBJECT_COUNT 746
 
 extern const GameObject game_objects[GAME_OBJECT_COUNT];

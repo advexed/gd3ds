@@ -1193,6 +1193,10 @@ void collide_with_objects(Player *player) {
             Section *sec = get_section(sx + dx, sy + dy);
             for (int i = 0; i < sec->object_count; i++) {
                 int obj = sec->objects[i];
+
+                // Skip invalid objects
+                if (!is_valid_object(objects.id[obj])) continue;
+
                 const ObjectHitbox *hitbox = game_objects[objects.id[obj]].hitbox;
 
                 if (!hitbox) continue;

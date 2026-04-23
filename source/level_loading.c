@@ -690,6 +690,8 @@ GDValueType get_value_type_for_key(int key) {
 // Convert some 2.1 objects into the 1.9 ones, blame robtop for making GD convert those to 2.1
 int convert_object(int id) {
     switch (id) {
+        case V2_0_LINE_TRIGGER:
+            return LINE_TRIGGER;
         // Saws
         case 1734:
             return 675;
@@ -885,7 +887,7 @@ bool obj_has_detail(const GameObject *obj) {
 }
 
 bool is_valid_object(int id) {
-    return id >= 1 && id < 745;
+    return id >= 1 && id < GAME_OBJECT_COUNT;
 }
 
 int parse_gd_object(const char *objStr, int obj) {
@@ -921,8 +923,10 @@ int parse_gd_object(const char *objStr, int obj) {
                 break;
         }
     }
+
+    int obj_id = objects.id[obj];
     
-    if (is_valid_object(objects.id[obj])) {
+    if (is_valid_object(obj_id)) {
         const GameObject *game_object = &game_objects[objects.id[obj]];
 
         if (game_object->swap_base_detail) {
@@ -971,7 +975,7 @@ int parse_gd_object(const char *objStr, int obj) {
         if (objects.x[obj] > level_info.last_obj_x) {
             level_info.last_obj_x = objects.x[obj];
         }
-    } else {
+    } else if ((obj_id < 0 || obj_id >= GAME_OBJECT_COUNT) && obj_id != COL_TRIGGER) { // Do not replace 2.0 col trigger
         // Invalid object
         objects.id[obj] = 0;
     }
