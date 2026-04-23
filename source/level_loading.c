@@ -971,6 +971,9 @@ int parse_gd_object(const char *objStr, int obj) {
         if (objects.x[obj] > level_info.last_obj_x) {
             level_info.last_obj_x = objects.x[obj];
         }
+    } else {
+        // Invalid object
+        objects.id[obj] = 0;
     }
 
     free_string_array(tokens, count);
