@@ -993,13 +993,13 @@ bool circle_rect_collision(float cx, float cy, float radius,
 void handle_collision(Player *player, int obj, const ObjectHitbox *hitbox) {
     InternalHitbox internal = player->internal_hitbox;
 
-    int clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD) ? 7 : 10;
+    float clip = (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_BIRD) ? 7 : 10;
     switch (hitbox->collision_type) {
         //case HITBOX_BREAKABLE_BLOCK:
         case HITBOX_SOLID: 
             bool gravSnap = false;
 
-            clip += fabsf(state.old_player.vel_y) * delta;
+            clip += fabsf(player->vel_y) * STEPS_DT;
 
             
             if (player->gravObj_id >= 0 && GET_HITBOX_COUNTER(player->gravObj_id) == 1) {
