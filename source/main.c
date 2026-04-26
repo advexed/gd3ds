@@ -620,6 +620,14 @@ void game_loop() {
                 MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
                 update_p1_trail(&state.player2);
             }
+
+            if (state.mirroring) {
+                state.mirror_timer += delta;
+                if (state.mirror_timer > MIRROR_DURATION) {
+                    state.mirroring = 0;
+                    state.mirror_factor = state.intended_mirror_factor;
+                }
+            }
         }
         
         if (wideEnabled != old_wide) {        

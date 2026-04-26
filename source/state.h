@@ -7,6 +7,8 @@
 #define MAX_LEVEL_HEIGHT 2400.f
 #define HITBOX_TRAIL_SIZE 64
 
+#define MIRROR_DURATION 0.4f
+
 typedef struct {
     float x;
     float y;
@@ -54,9 +56,13 @@ typedef struct {
 
     Player old_player;
 
-    int mirror_mult;
+    bool mirroring;
+    int mirror_mult;    
+    float mirror_timer;
+
+    float original_mirror_factor;
     float intended_mirror_factor;
-    float intended_mirror_speed_factor;
+
     float mirror_speed_factor;
     float mirror_factor;
 

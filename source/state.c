@@ -167,11 +167,9 @@ void init_variables() {
     state.camera_wall_timer = 0;
     state.camera_wall_initial_y = 0;
 
-    state.mirror_factor = 0;
+    state.mirroring = false;
+    state.mirror_factor = 0.f;
     state.mirror_speed_factor = 1.f;
-    state.intended_mirror_factor = 0;
-    state.intended_mirror_speed_factor = 1.f;
-
 
     current_fading_effect = FADE_NONE;
     memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);

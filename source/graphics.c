@@ -1453,8 +1453,9 @@ float approachf(float current, float target, float speed, float smoothing) {
 
 
 void handle_mirror_transition() {
-    state.mirror_factor = approachf(state.mirror_factor, state.intended_mirror_factor, 0.01f, 0.002f);
-    state.mirror_speed_factor = approachf(state.mirror_speed_factor, state.intended_mirror_speed_factor, 0.02f, 0.004f);
+    state.mirror_factor = easeValue(EASE_IN_OUT, state.original_mirror_factor, state.intended_mirror_factor, state.mirror_timer, MIRROR_DURATION, 1.2);
+
+    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
     if (state.mirror_factor >= 0.5f) {
         state.mirror_mult = -1;
     } else {

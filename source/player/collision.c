@@ -482,8 +482,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
             
         case ORANGE_MIRROR_PORTAL:
             if (!GET_ACTIVATED(obj)) {
+                state.mirroring = true;
+                state.mirror_timer = 0;
+                state.original_mirror_factor = state.mirror_factor;
                 state.intended_mirror_factor = 1.f;
-                state.intended_mirror_speed_factor = -1.f;
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                 if (effect) {
                     effect->def.colorR = 255 / 255.f;
@@ -496,8 +498,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
 
         case BLUE_MIRROR_PORTAL:
             if (!GET_ACTIVATED(obj)) {
+                state.mirroring = true;
+                state.mirror_timer = 0;
+                state.original_mirror_factor = state.mirror_factor;
                 state.intended_mirror_factor = 0.f;
-                state.intended_mirror_speed_factor = 1.f;
                 
                 UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                 if (effect) {
