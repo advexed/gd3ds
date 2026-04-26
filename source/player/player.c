@@ -302,7 +302,6 @@ void ball_gamemode(Player *player) {
         MotionTrail_StopStroke(trail);
         player->ball_rotation_speed = 1.f;
     }
-
     
     drag_particles[state.current_player].emitterX = player->x;
     drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
@@ -310,9 +309,8 @@ void ball_gamemode(Player *player) {
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
     drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
-
     // Jump
-    if ((state.input.holdJump) && (player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
+    if ((player->slope_data.slope_id >= 0 || player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
         float delta_y = player->vel_y;
 
         player->upside_down ^= 1;

@@ -684,7 +684,11 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             break;
                     }
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
-                
+
+                    if (state.old_player.gamemode == GAMEMODE_SHIP) {
+                        player->buffering_state = BUFFER_READY;
+                    }
+
                     player->inverse_rotation = false;
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
@@ -718,7 +722,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     flip_other_player(state.current_player ^ 1);
 
-                    if (state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
+                    if (state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) {
                         player->buffering_state = BUFFER_READY;
                     }
 
