@@ -626,6 +626,7 @@ void game_loop() {
                 if (state.mirror_timer > MIRROR_DURATION) {
                     state.mirroring = 0;
                     state.mirror_factor = state.intended_mirror_factor;
+                    state.mirror_speed_factor = 1 - 2*state.mirror_factor;
                 }
             }
         }
