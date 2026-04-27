@@ -100,7 +100,7 @@ void action_open_info_card(int id, UIElement* e) {
             break;
         case 7:
             // ULTRA accurate percentage info
-            set_info_content("But mom! I want more decimals!!!!.", "(use at your own risk)", true);
+            set_info_content("But mom! I want more decimals!!!!", "(use at your own risk)", true);
             break;
     }
     in_info_card = true;

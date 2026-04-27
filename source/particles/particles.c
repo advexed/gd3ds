@@ -472,7 +472,7 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
     int count = d->count;
 
     for (int i = 0; i < count; i++) {
-        float x = d->posx[i] + x_offset;
+        float x = d->posx[i];
         float y = d->posy[i];
         float size = d->size[i];
 
@@ -497,6 +497,7 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
             x = get_mirror_x(x + x_offset, state.mirror_factor);
         } else {
             // Flip
+            x += x_offset;
             y = (GSP_SCREEN_WIDTH - y);
         }
 
