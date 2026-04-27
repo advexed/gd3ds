@@ -34,8 +34,7 @@ Geometry Dash and its respective resources are by RobTop Games.
  - __camila314__ - Pathfinder Mod's physics
 
 ## Download
-You can download the .3dsx file for Homebrew Launcher here: [3dsx version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-3dsx.zip)\
-If you prefer having it in your home menu you can download the cia here: [cia version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-cia.zip)
+You can download both the .3dsx and the .cia file here: [Download](https://github.com/AleFunky/gd3ds/releases/tag/nightly)
 
 # Discord
 You can come to our Discord server and get help (or talk if you want): [Discord](https://discord.gg/Yh6JrS7eSU)
