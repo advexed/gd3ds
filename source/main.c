@@ -467,6 +467,13 @@ void game_loop() {
                     handle_mirror_transition();
 
                     state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
+                    if (state.level_progress < 0) {
+                        state.level_progress = 0;
+                    }
+                    
+                    if (state.level_progress > 100) {
+                        state.level_progress = 100;
+                    }
 
                     if (state.dead) break;
 
