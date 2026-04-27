@@ -170,6 +170,7 @@ void init_variables() {
     state.mirroring = false;
     state.mirror_factor = 0.f;
     state.mirror_speed_factor = 1.f;
+    state.mirror_mult = 1;
 
     current_fading_effect = FADE_NONE;
     memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
