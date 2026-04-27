@@ -526,7 +526,7 @@ static inline uint32_t make_sort_key(SpriteObject *s)
     int zlayer = objects.zlayer[obj] ? objects.zlayer[obj] : game_obj->z_layer;
 
     // Blending makes zlayer one 
-    int col_channel = objects.col_channel[obj];
+    int col_channel = s->col_channel;
 
     bool blending = col_channel > 0 && (channels[col_channel].blending ^ ((zlayer & 1) == 0));
 
