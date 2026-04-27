@@ -742,18 +742,18 @@ void handle_special_fading(int obj, float calc_x, float calc_y) {
                 }
             } else {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transition_applied[obj] = FADE_UP_SLOW;
+                    objects.transition_applied[obj] = FADE_UP_SLOW_LEFT;
                 } else {
-                    objects.transition_applied[obj] = FADE_DOWN_SLOW;
+                    objects.transition_applied[obj] = FADE_DOWN_SLOW_LEFT;
                 }
             }
             break;
         case FADE_CIRCLE_RIGHT:
             if (calc_x > (SCREEN_WIDTH / SCALE / 2)) {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
-                    objects.transition_applied[obj] = FADE_UP_SLOW;
+                    objects.transition_applied[obj] = FADE_UP_SLOW_RIGHT;
                 } else {
-                    objects.transition_applied[obj] = FADE_DOWN_SLOW;
+                    objects.transition_applied[obj] = FADE_DOWN_SLOW_RIGHT;
                 }
             } else {
                 if (calc_y > (SCREEN_HEIGHT / SCALE / 2)) {
@@ -790,13 +790,25 @@ void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale
         case FADE_SCALE_OUT:
             *fade_scale = get_out_scale_fade(x, SCREEN_WIDTH / SCALE);
             break;
-        case FADE_UP_SLOW:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) * ((current_fading_effect == FADE_CIRCLE_RIGHT) ? 1 : -1);
+        case FADE_UP_SLOW_LEFT:
+            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            break;
+        case FADE_UP_SLOW_RIGHT:
+            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            break;
         case FADE_UP_STATIONARY:
             *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
             break;
-        case FADE_DOWN_SLOW:
-            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) * ((current_fading_effect == FADE_CIRCLE_RIGHT) ? 1 : -1);
+        case FADE_DOWN_SLOW_LEFT:
+            *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            break;
+        case FADE_DOWN_SLOW_RIGHT:
+            *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
+            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            break;
         case FADE_DOWN_STATIONARY:
             *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
             break;
@@ -968,7 +980,7 @@ void create_objects() {
 
                 get_fade_vars(obj, calc_x, &fade_x, &fade_y, &fade_scale);
 
-                objects.rotation[obj] += (((objects.random[obj] & 1) ? -get_rotation_speed(objects.id[obj]) : get_rotation_speed(objects.id[obj]))) * DT;
+                objects.rotation[obj] += (((objects.random[obj] & 1) ? -get_rotation_speed(objects.id[obj]) : get_rotation_speed(objects.id[obj]))) * delta;
                 
                 // Handle special fade types
                 if (objects.transition_applied[obj] == FADE_DOWN_STATIONARY || objects.transition_applied[obj] == FADE_UP_STATIONARY) {
@@ -984,7 +996,7 @@ void create_objects() {
                 spawn_object_at(
                     obj,
                     objects.id[obj],
-                    get_mirror_x(calc_x, state.mirror_factor) + fade_x,
+                    get_mirror_x(calc_x + fade_x, state.mirror_factor),
                     calc_y + fade_y,
                     objects.rotation[obj],
                     objects.flippedH[obj] ^ (state.mirror_mult < 0),
