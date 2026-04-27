@@ -28,16 +28,16 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: gd3ds-3dsx
-          path: out/rom
+          path: out/3dsx/rom
           archive: false
       - name: Publish cia to GH Actions
         uses: actions/upload-artifact@main
         with:
           name: gd3ds-cia
-          path: out/rom
+          path: out/cia/rom
           archive: false
       - name: Create or update nightly release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: nightly
           name: Nightly Build
@@ -45,7 +45,9 @@ jobs:
             Latest nightly build from commit ${{ github.sha }}
           prerelease: true
           make_latest: true
-          files: out/rom/*
+          files: |
+            out/3dsx/rom/*
+            out/cia/rom/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
