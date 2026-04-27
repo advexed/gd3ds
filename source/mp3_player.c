@@ -28,6 +28,7 @@ static volatile bool quit = false;
 static volatile bool looping = false;
 static volatile bool skip = false;
 static volatile bool paused = false;
+static volatile bool restart_requested = false;
 
 volatile float amplitude = 0;
 
@@ -234,8 +235,18 @@ void audio_thread(void *const file) {
             }
         }
 
-        if (lastbuf)
-            break;
+        if (lastbuf) {
+            while (!restart_requested && !quit) {
+                amplitude = calculate_amplitude(0);
+                svcSleepThread((long) 1.666666666666e+7);
+            }
+
+            if (quit) break;
+
+            restart_requested = false;
+            lastbuf = false;
+            continue;
+        }
 
         if (ndspChnIsPaused(MUSIC_CHANNEL)) {
             LightEvent_Wait(&soundEvent);
@@ -243,12 +254,6 @@ void audio_thread(void *const file) {
         }
 
         LightEvent_Wait(&soundEvent);
-
-    }
-
-    while (amplitude > AMP_MIN && !quit) {
-        amplitude = calculate_amplitude(0);
-        svcSleepThread((long) 1.666666666666e+7);
     }
 }
 
@@ -314,6 +319,7 @@ void seek_mp3(float time) {
         LightLock_Unlock(&decoderLock);
         ndspChnSetPaused(MUSIC_CHANNEL, oldstate); //once the seeking is done, playback can continue.
 
+        restart_requested = true;
         LightEvent_Signal(&seekEvent);
     }
 }
