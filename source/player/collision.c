@@ -693,7 +693,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                     set_gamemode(player, GAMEMODE_PLAYER_BALL);
 
-                    if (state.old_player.gamemode == GAMEMODE_SHIP) {
+                    if (state.input.holdJump && state.old_player.gamemode == GAMEMODE_SHIP) {
                         player->buffering_state = BUFFER_READY;
                     }
 
