@@ -82,7 +82,7 @@ typedef struct {
 } UITextbox;
 
 typedef struct {
-    char text[256];
+    char text[512];
     float alignment;
     float scale;
     int font;

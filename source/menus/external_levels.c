@@ -43,8 +43,8 @@ static UIElement *path_label;
 
 UIElement texts[UI_LIST_MAX_ITEMS];
 
-char current_path[256] = { 0 };
-char last_path[256] = { 1 };
+char current_path[320] = { 0 };
+char last_path[320] = { 1 };
 
 static void open_folder(UIElement *e);
 
@@ -57,35 +57,38 @@ static void open_level(UIElement *e) {
     play_sfx(&play_sound, 1);
 
     state.custom_level = true;
-    strncpy(state.custom_level_path, e->external_level_card.path, 256);
+    strncpy(state.custom_level_path, e->external_level_card.path, sizeof(state.custom_level_path));
 
     set_fade_status(FADE_STATUS_OUT);
     start_level = true; 
 }
 
 void load_level_folder(char *folder) {
-    if (strncmp(last_path, current_path, 256) == 0) return;
+    if (strncmp(last_path, current_path, sizeof(last_path)) == 0) return;
     ui_list_reset(list);
     path_label = ui_get_element_by_tag(&screen, "path");
     ui_run_func_on_tag(&screen, "no_levels", ui_disable_element);
-    char path[261];
-    sprintf(path, "Root/%s", current_path);
+
+    char path[320+5];
+    sprintf(path, "Root%s", current_path);
     truncate_filename(path, 30);
-    strncpy(path_label->label.text, path, 256);
+    strncpy(path_label->label.text, path, sizeof(path_label->label.text));
+
     int count = 0;
     FileOrFolder *entries = load_folder(folder, &count);
     char level_name[256];
     if (entries && list) {
         for (int i = 0; i < count && i < UI_LIST_MAX_ITEMS; i++) {
             FileOrFolder *entry = &entries[i];
+            strncpy(level_name, entry->name, sizeof(level_name) - 1);
             if (entry->is_dir) {
                 // Folder
-                char *name = strip_filename(entry->name);
+                char *name = strip_filename(level_name);
                 truncate_filename(name, 16);
                 texts[i] = ui_create_external_level_card(0, 0, 320, 0, name, entry->name, open_folder, NULL);
                 ui_list_add(list, &texts[i]);
             } else {
-                strncpy(level_name, entry->name, 255);
+                // File
                 strip_extension(level_name);
                 char *name = strip_filename(level_name);
                 truncate_filename(name, 16);
@@ -97,7 +100,7 @@ void load_level_folder(char *folder) {
         ui_run_func_on_tag(&screen, "no_levels", ui_enable_element);
     }
 
-    strncpy(last_path, current_path, 256);
+    strncpy(last_path, current_path, sizeof(last_path));
 }
 
 static void action_go_back(UIElement *e) {
@@ -107,10 +110,18 @@ static void action_go_back(UIElement *e) {
     }
 }
 
+// Go my warning suppresion gadget
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+
 static void open_folder(UIElement *e) {
-    strncpy(current_path, e->external_level_card.path, 256);
+    char tmp[320];
+    snprintf(tmp, sizeof(tmp), "%s/%s", current_path, e->external_level_card.path);
+    memcpy(current_path, tmp, sizeof(tmp));
     load_level_folder(current_path);
 }
+
+#pragma GCC diagnostic pop
 
 static UIAction actions[] = {
     {"exit", action_exit },
