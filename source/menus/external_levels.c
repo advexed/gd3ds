@@ -70,8 +70,8 @@ void load_level_folder(char *folder) {
     ui_run_func_on_tag(&screen, "no_levels", ui_disable_element);
 
     char path[320+5];
-    sprintf(path, "Root%s", current_path);
-    truncate_filename(path, 30);
+    sprintf(path, "Root/%s", current_path);
+    truncate_filename_start(path, 30, sizeof(path));
     strncpy(path_label->label.text, path, sizeof(path_label->label.text));
 
     int count = 0;
@@ -116,8 +116,17 @@ static void action_go_back(UIElement *e) {
 
 static void open_folder(UIElement *e) {
     char tmp[320];
-    snprintf(tmp, sizeof(tmp), "%s/%s", current_path, e->external_level_card.path);
-    memcpy(current_path, tmp, sizeof(tmp));
+
+    if (current_path[0] == '\0') {
+        // First level: no leading slash
+        snprintf(tmp, sizeof(tmp), "%s", e->external_level_card.path);
+    } else {
+        snprintf(tmp, sizeof(tmp), "%s/%s", current_path, e->external_level_card.path);
+    }
+
+    strncpy(current_path, tmp, sizeof(current_path) - 1);
+    current_path[sizeof(current_path) - 1] = '\0';
+
     load_level_folder(current_path);
 }
 

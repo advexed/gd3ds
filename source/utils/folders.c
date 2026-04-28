@@ -138,3 +138,29 @@ void truncate_filename(char *name, size_t max_len) {
         strcat(name, "...");
     }
 }
+
+void truncate_filename_start(char *name, size_t max_len, size_t buffer_size) {
+    size_t len = strlen(name);
+
+    if (len > max_len) {
+        const char *ellipsis = "...";
+        size_t ellipsis_len = strlen(ellipsis);
+
+        if (max_len <= ellipsis_len) {
+            // Not enough space, just truncate hard
+            name[max_len] = '\0';
+            return;
+        }
+
+        size_t keep_len = max_len - ellipsis_len;
+
+        // Move the last part of the string to the front
+        memmove(name, name + (len - keep_len), keep_len);
+
+        // Add ellipsis at the start
+        memmove(name + ellipsis_len, name, keep_len);
+        memcpy(name, ellipsis, ellipsis_len);
+
+        name[max_len] = '\0';
+    }
+}
