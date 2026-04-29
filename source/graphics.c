@@ -178,12 +178,17 @@ float mirror_angle(float angle, bool hflip, bool vflip)
 }
 
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
+    int obj_id = objects.id[obj];
     int col_channel = game_obj->base_color;
     if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
     else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
     else {
         if (objects.v1p9_col_channel[obj]) {
-            if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
+            if (obj_id >= 15 && obj_id <= 17) {
+                if (col_type == COLOR_TYPE_BASE) col_channel = objects.v1p9_col_channel[obj];
+            } else {
+                if (col_type == COLOR_TYPE_DETAIL) col_channel = objects.v1p9_col_channel[obj];
+            }
         } else {
             if (objects.col_channel[obj]) {
                 if (col_type == COLOR_TYPE_BASE) {
