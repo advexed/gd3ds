@@ -803,11 +803,11 @@ void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale
             break;
         case FADE_DOWN_SLOW_LEFT:
             *fade_x = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
             break;
         case FADE_DOWN_SLOW_RIGHT:
             *fade_x = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE);
-            *fade_y = get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
+            *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
             break;
         case FADE_DOWN_STATIONARY:
             *fade_y = -get_xy_fade_offset(x, SCREEN_WIDTH / SCALE) / 3;
