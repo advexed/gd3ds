@@ -900,7 +900,7 @@ void draw_triangle_from_rect(Vec2D rect[4], int skip_index, uint32_t color) {
     // Collect 3 points that are not the skipped one
     for (int i = 0; i < 4; ++i) {
         if (i == skip_index) continue;
-        tri[ti].x = calc_x_on_screen(rect[i].x);
+        tri[ti].x = mirror_x_on_screen(rect[i].x);
         tri[ti++].y = calc_y_on_screen(rect[i].y);
     }
 
@@ -917,8 +917,8 @@ void draw_square(Vec2D rect[4], uint32_t color) {
         int j = (i + 1) % 4;
 
         draw_hitbox_line_inward(rect,
-            calc_x_on_screen(rect[i].x), calc_y_on_screen(rect[i].y),
-            calc_x_on_screen(rect[j].x), calc_y_on_screen(rect[j].y),
+            mirror_x_on_screen(rect[i].x), calc_y_on_screen(rect[i].y),
+            mirror_x_on_screen(rect[j].x), calc_y_on_screen(rect[j].y),
             1.5f, center.x, center.y, color
         );
     }
@@ -958,7 +958,7 @@ void draw_hitbox(int obj) {
     } else if (hitbox->type == COLLISION_CIRCLE) {
         float calc_radius = hitbox->width;
 
-        custom_circunference(calc_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
+        custom_circunference(mirror_x_on_screen(x), calc_y_on_screen(y), calc_radius, color, 2.f);
     } else if (w != 0 && h != 0) {
         //if (hitbox_type == HITBOX_SPECIAL && !objects.touch_triggered[obj]) return;
         get_corners(x, y, w, h, angle, rect);

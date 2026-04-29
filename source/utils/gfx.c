@@ -251,9 +251,14 @@ bool C2D_DrawTriangleUV(float x0, float y0, float u0, float v0, u32 clr0, float 
 }
 
 float calc_x_on_screen(float val) {
-    return get_mirror_x(val - state.camera_x, state.mirror_factor);
-    
+    return get_mirror_x(val - state.camera_x, state.mirror_factor); 
 }
+
+// Same as calc_x_on_screen but doesn't do the animation
+float mirror_x_on_screen(float val) {
+    return get_mirror_x(val - state.camera_x, state.mirror_factor >= 0.5f ? 1 : 0); 
+}
+
 float calc_y_on_screen(float val) {
     return SCREEN_HEIGHT - ((val - state.camera_y));
 }

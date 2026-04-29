@@ -168,6 +168,8 @@ void init_variables() {
     state.camera_wall_initial_y = 0;
 
     state.mirroring = false;
+    state.original_mirror_factor = 0.f;
+    state.intended_mirror_factor = 0.f;
     state.mirror_factor = 0.f;
     state.mirror_speed_factor = 1.f;
     state.mirror_mult = 1;
