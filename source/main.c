@@ -460,6 +460,9 @@ void game_loop() {
                     u64 start_physics = svcGetSystemTick();
                     state.current_player = 0;
                     state.old_player = state.player;
+                    if (state.dual) {
+                        state.player2.x = state.player.x;
+                    }
                     
                     trail = &trail_p1;
                     wave_trail = &wave_trail_p1;

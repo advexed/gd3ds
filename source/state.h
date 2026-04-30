@@ -76,7 +76,6 @@ typedef struct {
     bool noclip;
     int hitbox_display;
     bool dual;
-    bool dual_setup;
     bool dead;
 
     bool profiling;
