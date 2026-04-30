@@ -120,6 +120,16 @@ void MotionTrail_StopStroke(MotionTrail* trail) {
     }
 }
 
+void MotionTrail_CopyTrail(MotionTrail *dst, MotionTrail *src) {
+    memcpy(&dst->pointState, &src->pointState, sizeof(src->pointState));
+    memcpy(&dst->pointVertexes, &src->pointVertexes, sizeof(src->pointVertexes));
+    memcpy(&dst->vertices, &src->vertices, sizeof(src->vertices));
+    memcpy(&dst->centerVertices, &src->centerVertices, sizeof(src->centerVertices));
+    dst->actualNuPoints = src->actualNuPoints;
+    dst->previousNuPoints = src->previousNuPoints;
+    dst->offscreenCount = src->offscreenCount;
+}
+
 void MotionTrail_Update(MotionTrail* trail, float delta) {
     if (trail->waveTrail) return;
     if (!trail->startingPositionInitialized) return;

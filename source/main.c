@@ -622,10 +622,22 @@ void game_loop() {
             MotionTrail_UpdateWaveTrail(&wave_trail_p1, delta);
             update_p1_trail(&state.player);
 
+           
+
+            MotionTrail_Update(&trail_p2, delta);
+            MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
+                
             if (state.dual) {
-                MotionTrail_Update(&trail_p2, delta);
-                MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
                 update_p1_trail(&state.player2);
+            }
+            
+            if (!state.dual || state.player.cutscene_timer > 0) {
+                if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * 240) * delta;
+                
+                if (wave_trail_p2.opacity <= 0) {
+                    wave_trail_p2.opacity = 0;
+                    wave_trail_p2.nuPoints = 0;
+                }
             }
 
             if (state.mirroring) {

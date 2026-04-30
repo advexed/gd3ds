@@ -1118,9 +1118,10 @@ void draw_objects() {
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
             if (state.dual) {
                 draw_p1_trail(&state.player2);
-                MotionTrail_Draw(&trail_p2);
-                MotionTrail_DrawWaveTrail(&wave_trail_p2);
             }
+            
+            MotionTrail_Draw(&trail_p2);
+            MotionTrail_DrawWaveTrail(&wave_trail_p2);
 
             change_blending(false);
             blend_enabled = false;

@@ -61,6 +61,8 @@ void MotionTrail_StopStroke(MotionTrail* trail);
 void MotionTrail_Draw(MotionTrail* trail);
 void MotionTrail_DrawWaveTrail(MotionTrail *trail);
 
+void MotionTrail_CopyTrail(MotionTrail *dst, MotionTrail *src);
+
 void MotionTrail_AddWavePoint(MotionTrail* trail);
 
 #endif

@@ -276,7 +276,6 @@ void setup_dual() {
     memset(&state.player2.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_DURATION);
     state.player2.p1_trail_pos = 0;
     state.player2.upside_down = state.player.upside_down ^ 1;
-    set_dual_bounds();
 }
 
 
@@ -791,10 +790,10 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->ceiling_inv_time = CEILING_INVUL_TIME;
                     state.dual = true;
                     state.dual_portal_y = objects.y[obj];
+                    setup_dual();
                 }
-                setup_dual();
+                set_dual_bounds();
                 if (state.player2.gamemode == GAMEMODE_DART) {
-                    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, get_white_if_black(p1_color), C2D_SpriteSheetGetImage(trailSheet, 0));   
                     wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(&wave_trail_p2);
@@ -809,6 +808,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     state.dual = false;
                     if (state.current_player == 1) {
                         memcpy(&state.player, player, sizeof(Player));
+
+                        MotionTrail_CopyTrail(&trail_p1, &trail_p2);
+                        MotionTrail_CopyTrail(&wave_trail_p1, &wave_trail_p2);   
                     }
                     switch (state.player.gamemode) {
                         case GAMEMODE_PLAYER:
@@ -824,6 +826,9 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                             state.ceiling_y = state.ground_y + 240;
                             set_intended_ceiling();
                     }
+                    
+                    MotionTrail_StopStroke(&trail_p2);
+                    MotionTrail_StopStroke(&wave_trail_p2);
 
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {

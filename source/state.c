@@ -244,6 +244,7 @@ void init_variables() {
         state.dual = true;
         state.dual_portal_y = 0.f;
         setup_dual();
+        set_dual_bounds();
     }
     run_camera();
 
