@@ -222,7 +222,7 @@ void draw_player_hitbox(Player *player);
 void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 
-void update_p1_trail(Player *player);
-void draw_p1_trail(Player *player);
+void update_p1_trail(Player *player, int player_id);
+void draw_p1_trail(Player *player, int player_id);
 
 void update_rotation_direction(Player *player);

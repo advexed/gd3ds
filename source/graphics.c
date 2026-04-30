@@ -1113,13 +1113,11 @@ void draw_objects() {
             drawParticleSystem(&coin_pickup_particles, 0, 0, 1.f);
             drawParticleSystem(&glitter_particles, 0, 0, 1.f);
 
-            draw_p1_trail(&state.player);
+            draw_p1_trail(&state.player, 0);
             MotionTrail_Draw(&trail_p1);
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
-            if (state.dual) {
-                draw_p1_trail(&state.player2);
-            }
-            
+
+            draw_p1_trail(&state.player2, 1);
             MotionTrail_Draw(&trail_p2);
             MotionTrail_DrawWaveTrail(&wave_trail_p2);
 

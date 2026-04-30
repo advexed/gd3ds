@@ -751,10 +751,13 @@ void spawn_p1_trail(Player *player) {
     }
 }
 
-void update_p1_trail(Player *player) {
+void update_p1_trail(Player *player, int player_id) {
     // Spawn new p1 icon
     if (!state.dead && p1_trail && (frame_counter % 3) == 0) {
-        spawn_p1_trail(player);
+        // If current player is player 2, dual must be true
+        if (player_id == 0 || state.dual) {
+            spawn_p1_trail(player);
+        }
     }
 
     for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
@@ -773,7 +776,7 @@ void update_p1_trail(Player *player) {
     }
 }
 
-void draw_p1_trail(Player *player) {
+void draw_p1_trail(Player *player, int player_id) {
     for (size_t i = 0; i < P1_TRAIL_LENGTH; i++) {
         P1Trail *trail_data = &player->p1_trail_data[i];
 
@@ -782,7 +785,7 @@ void draw_p1_trail(Player *player) {
             float calc_y = SCREEN_HEIGHT - ((trail_data->y - state.camera_y));
             bool flip_x = (state.mirror_mult < 0);
 
-            u32 color = (state.current_player == 1) ? C2D_Color32(p2_color.r, p2_color.g, p2_color.b, trail_data->opacity * 255) : C2D_Color32(p1_color.r, p1_color.g, p1_color.b, trail_data->opacity * 255);
+            u32 color = (player_id == 1) ? C2D_Color32(p2_color.r, p2_color.g, p2_color.b, trail_data->opacity * 255) : C2D_Color32(p1_color.r, p1_color.g, p1_color.b, trail_data->opacity * 255);
 
             spawn_p1_layer_at(
                 trail_data->gamemode, *current_icons[trail_data->gamemode], 
