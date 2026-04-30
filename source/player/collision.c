@@ -791,6 +791,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     state.dual = true;
                     state.dual_portal_y = objects.y[obj];
                     setup_dual();
+                    if (state.current_player == 0) state.player2.x = state.old_player.x; // Sync them
                 }
                 set_dual_bounds();
                 if (state.player2.gamemode == GAMEMODE_DART) {
