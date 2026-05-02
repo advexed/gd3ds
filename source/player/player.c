@@ -40,6 +40,9 @@ ParticleSystem fast_speed_particles;
 ParticleSystem faster_speed_particles;
 ParticleSystem coin_pickup_particles;
 
+PlayerAction player_actions[2][MAX_ACTIONS];
+int num_actions[2] = {0};
+
 int frame_skipped = 0;
 
 const float player_speeds[SPEED_COUNT] = {
@@ -630,8 +633,6 @@ void run_player(Player *player) {
         slope_calc(player->slope_data.slope_id, player);
     }
 
-    
-
     if (player->gamemode == GAMEMODE_DART) {
         wave_trail->positionR = (Vec2){player->x, player->y};  
         wave_trail->startingPositionInitialized = true;
@@ -682,6 +683,11 @@ void handle_player(Player *player) {
         player->vel_y = player->new_vel_y;
         player->new_vel_y = __FLT_MAX__;
     }
+
+    for (int i = 0; i < num_actions[state.current_player]; i++) {
+        player_actions[state.current_player][i].func(player);
+    }
+    num_actions[state.current_player] = 0;
 
     u64 start = svcGetSystemTick();
     collide_with_objects(player);
@@ -1021,5 +1027,12 @@ void draw_hitbox_trail(int player) {
         player.rotation = hitbox.rotation;
 
         draw_player_hitbox(&player);
+    }
+}
+
+void push_player_action(void (*func)(Player *)) {
+    int count = num_actions[state.current_player];
+    if (count < MAX_ACTIONS) {
+        player_actions[state.current_player][num_actions[state.current_player]++].func = func;
     }
 }

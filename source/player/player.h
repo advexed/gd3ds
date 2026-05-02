@@ -23,6 +23,8 @@ extern int frame_skipped;
 
 #define BALL_SLOW_ROTATION 0.7f
 
+#define MAX_ACTIONS 64
+
 typedef struct {
     int slope_id;
     float elapsed;
@@ -133,6 +135,10 @@ typedef struct {
     P1Trail p1_trail_data[P1_TRAIL_LENGTH];
 } Player;
 
+typedef struct {
+    void (*func)(Player *);
+} PlayerAction;
+
 enum BufferingState {
     BUFFER_NONE,
     BUFFER_READY,
@@ -146,6 +152,9 @@ enum PlayerSpeeds {
     SPEED_FASTER,
     SPEED_COUNT
 };
+
+extern PlayerAction player_actions[2][MAX_ACTIONS];
+extern int num_actions[2];
 
 extern float collision_time;
 extern float player_time;
@@ -226,3 +235,5 @@ void update_p1_trail(Player *player, int player_id);
 void draw_p1_trail(Player *player, int player_id);
 
 void update_rotation_direction(Player *player);
+
+void push_player_action(void (*func)(Player *));
