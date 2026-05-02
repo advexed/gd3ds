@@ -490,19 +490,18 @@ void slope_collide(int obj, Player *player) {
     );
 
     int slope = player->slope_data.slope_id;
-    if ((slope < 0 || !slope_touching(slope, player) || (grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && grav(player, expected_slope_y(obj, player)) > grav(player, expected_slope_y(slope, player))) || slope == obj)
-        && slope_touching(obj, player) && colliding && obj_gravTop(player, obj) - gravBottom(player) > 1)
-        //(slope < 0 || grav_slope_orient(slope, player) == grav_slope_orient(obj, player) ||
-        //    (
-        //        // Check if going from going down to up
-        //        grav_slope_orient(slope, player) != grav_slope_orient(obj, player) && 
-        //        (
-        //            (grav_slope_orient(slope, player) == ORIENT_NORMAL_DOWN && grav_slope_orient(obj, player) == ORIENT_NORMAL_UP) ||
-        //            (grav_slope_orient(slope, player) == ORIENT_UD_DOWN && grav_slope_orient(obj, player) == ORIENT_UD_UP)
-        //        )
-        //    ) 
-        //) && slope_touching(obj, player) && colliding && obj_gravTop(player, obj) - gravBottom(player) > 1
-    {
+    if (
+        (slope < 0 || grav_slope_orient(slope, player) == grav_slope_orient(obj, player) ||
+            (
+                // Check if going from going down to up
+                grav_slope_orient(slope, player) != grav_slope_orient(obj, player) && 
+                (
+                    (grav_slope_orient(slope, player) == ORIENT_NORMAL_DOWN && grav_slope_orient(obj, player) == ORIENT_NORMAL_UP) ||
+                    (grav_slope_orient(slope, player) == ORIENT_UD_DOWN && grav_slope_orient(obj, player) == ORIENT_UD_UP)
+                )
+            ) 
+        ) && slope_touching(obj, player) && colliding && obj_gravTop(player, obj) - gravBottom(player) > 1
+    ) {
         if (slope >= 0 && slope_angle(obj, player) < slope_angle(slope, player)) return;
         
         float angle = atanf((state.old_player.vel_y * STEPS_DT) / (player_speeds[state.speed] * STEPS_DT));
@@ -511,9 +510,9 @@ void slope_collide(int obj, Player *player) {
         bool hasSlope = state.old_player.slope_data.slope_id >= 0;
 
         // Check if the old slope and this slope have the same orientation, if not, then the player doesn't have an slope
-        //if (hasSlope && slope >= 0) {
-        //    hasSlope = objects.orientation[state.old_player.slope_data.slope_id] == objects.orientation[slope];
-        //}
+        if (hasSlope && slope >= 0) {
+            hasSlope = objects.orientation[state.old_player.slope_data.slope_id] == objects.orientation[slope];
+        }
         
 
         bool projectedHit = (orient == ORIENT_NORMAL_DOWN || orient == ORIENT_UD_DOWN) ? (angle * 5.f <= slope_angle(obj, player)) : (angle <= slope_angle(obj, player));
