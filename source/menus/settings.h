@@ -19,6 +19,8 @@ extern bool showProgressBar;
 extern bool showProgressPercent;
 extern bool decimalPercent;
 extern bool ultraDecimalPercent;
+extern bool switchTrailColor;
+extern bool switchWaveTrailColor;
 
 void settings_init();
 int settings_loop();

@@ -102,6 +102,14 @@ void action_open_info_card(int id, UIElement* e) {
             // ULTRA accurate percentage info
             set_info_content("But mom! I want more decimals!!!!", "(use at your own risk)", true);
             break;
+        case 8:
+            // Switch trail color
+            set_info_content("Make the trail use P1 instead of P2.", "", false);
+            break;
+        case 9:
+            // Switch wave trail color
+            set_info_content("Make the wave trail use  P1 instead of P2.", "", false);
+            break;
     }
     in_info_card = true;
 }

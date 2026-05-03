@@ -39,6 +39,8 @@ bool showProgressBar = false;
 bool showProgressPercent = false;
 bool decimalPercent = false;
 bool ultraDecimalPercent = false;
+bool switchTrailColor = false;
+bool switchWaveTrailColor = false;
 
 static Setting settings[] = {
     {
@@ -79,7 +81,13 @@ static Setting settings[] = {
     },
     {
         "chk_ultradecimalpercent", &ultraDecimalPercent
-    }
+    },
+    {
+        "chk_trailcolor", &switchTrailColor
+    },
+    {
+        "chk_wavetrailcolor", &switchWaveTrailColor
+    },
 };
 
 
@@ -90,7 +98,8 @@ const char *pages_tags[] = {
     "page1",
     "page2",
     "page3",
-    "page4"
+    "page4",
+    "page5",
 };
 
 #define NUMBER_PAGES (sizeof(pages_tags) / sizeof(char *))
@@ -162,6 +171,13 @@ void ultradecimalpercent_settings(UIElement* e) {
     ultraDecimalPercent = e->checkbox.checked;
 }
 
+void switchTrailColor_settings(UIElement* e) {
+    switchTrailColor = e->checkbox.checked;
+}
+void switchWaveTrailColor_settings(UIElement* e) {
+    switchWaveTrailColor = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -208,6 +224,14 @@ void action_info_ultra_decimal(UIElement *e) {
     action_open_info_card(7);
 }
 
+void action_info_trail(UIElement *e) {
+    action_open_info_card(8);
+}
+
+void action_info_wave_trail(UIElement *e) {
+    action_open_info_card(9);
+}
+
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
@@ -223,6 +247,8 @@ static UIAction actions[] = {
     { "progresspercent", progresspercent_settings },
     { "decimalPercent", decimalpercent_settings },
     { "ultraDecimalPercent", ultradecimalpercent_settings },
+    { "switchTrailColor", switchTrailColor_settings},
+    { "switchWaveTrailColor", switchWaveTrailColor_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -231,7 +257,9 @@ static UIAction actions[] = {
     { "hitboxinfo", action_info_hitboxes},
     { "debuginfo", action_info_debug},
     { "decimalinfo", action_info_decimal},
-    { "ultradecimalinfo", action_info_ultra_decimal}
+    { "ultradecimalinfo", action_info_ultra_decimal},
+    { "trailcolorinfo", action_info_trail},
+    { "wavetrailcolorinfo", action_info_wave_trail},
 };
 
 void settings_init() {

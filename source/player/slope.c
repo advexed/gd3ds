@@ -500,7 +500,7 @@ void slope_collide(int obj, Player *player) {
                     (grav_slope_orient(slope, player) == ORIENT_UD_DOWN && grav_slope_orient(obj, player) == ORIENT_UD_UP)
                 )
             ) 
-        ) && slope_touching(obj, player) && colliding && obj_gravTop(player, obj) - gravBottom(player) > 1
+        ) && slope_touching(obj, player) && colliding && obj_gravTop(player, obj) - gravBottom(player) > 2
     ) {
         if (slope >= 0 && slope_angle(obj, player) < slope_angle(slope, player)) return;
         

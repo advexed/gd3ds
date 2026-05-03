@@ -13,6 +13,8 @@
 #define CONFIG_CUSTOMIZATION_PATH "custom."
 #define CONFIG_MISC_PATH "misc."
 #define CONFIG_GAMEPLAY_PATH "gameplay."
+#define CONFIG_COSMETIC_PATH "cosmetic."
+
 
 #define CONFIG_OBJECT_DELIMITER "."
 
