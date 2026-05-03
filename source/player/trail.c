@@ -319,6 +319,8 @@ void MotionTrail_Draw(MotionTrail* trail) {
 
     int count = trail->nuPoints * 2;
 
+    bool rotated = Tex3DS_SubTextureRotated(trail->image.subtex);
+
     for (int i = 0; i < count - 2; i++) {
         int i0 = i;
         int i1 = i + 1;
@@ -347,12 +349,28 @@ void MotionTrail_Draw(MotionTrail* trail) {
 
         const Tex3DS_SubTexture *subtex = trail->image.subtex;
 
-        float u0 = map_range(t0.u, 0, 1, subtex->left, subtex->right);
-        float v0 = map_range(t0.v, 0, 1, subtex->bottom, subtex->top);
-        float u1 = map_range(t1.u, 0, 1, subtex->left, subtex->right);
-        float v1 = map_range(t1.v, 0, 1, subtex->bottom, subtex->top);
-        float u2 = map_range(t2.u, 0, 1, subtex->left, subtex->right);
-        float v2 = map_range(t2.v, 0, 1, subtex->bottom, subtex->top);
+        float u0;
+        float v0;
+        float u1;
+        float v1;
+        float u2;
+        float v2;
+
+        if (rotated) {
+            u0 = map_range(t0.u, 0, 1, subtex->top, subtex->bottom);
+            v0 = map_range(t0.v, 0, 1, subtex->left, subtex->right);
+            u1 = map_range(t1.u, 0, 1, subtex->top, subtex->bottom);
+            v1 = map_range(t1.v, 0, 1, subtex->left, subtex->right);
+            u2 = map_range(t2.u, 0, 1, subtex->top, subtex->bottom);
+            v2 = map_range(t2.v, 0, 1, subtex->left, subtex->right);
+        } else {
+            u0 = map_range(t0.u, 0, 1, subtex->left, subtex->right);
+            v0 = map_range(t0.v, 0, 1, subtex->top, subtex->bottom);
+            u1 = map_range(t1.u, 0, 1, subtex->left, subtex->right);
+            v1 = map_range(t1.v, 0, 1, subtex->top, subtex->bottom);
+            u2 = map_range(t2.u, 0, 1, subtex->left, subtex->right);
+            v2 = map_range(t2.v, 0, 1, subtex->top, subtex->bottom);
+        }
 
         C2D_DrawTriangleUV(
             x0, y0, u0, v0, C2D_Color32(c0[0], c0[1], c0[2], c0[3]), 
