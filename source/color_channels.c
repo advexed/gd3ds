@@ -130,9 +130,9 @@ void upload_to_buffer(int obj, int channel) {
     ColTriggerBuffer *buffer = &col_trigger_buffer[channel];
     buffer->old_color = channels[channel].color;
     if (objects.p1_color[obj]) {
-        buffer->new_color = get_white_if_black(p1_color);
+        buffer->new_color = get_p2_if_black(p1_color);
     } else if (objects.p2_color[obj]) {
-        buffer->new_color = get_white_if_black(p2_color);
+        buffer->new_color = get_p1_if_black(p2_color);
     } else {
         buffer->new_color.r = objects.trig_colorR[obj];
         buffer->new_color.g = objects.trig_colorG[obj];
