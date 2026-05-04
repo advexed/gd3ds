@@ -300,7 +300,7 @@ void ui_load_screen(UIScreen* screen,
         char text[256] = {0};
         char tag[TAGS_PER_ELEMENT][TAG_LENGTH] = {0};
 
-        float textScale = 1.0f;
+        float textScale = 0;
 
         // Parse element parameters
         while ((token = next_token(&cursor)) != NULL) {
@@ -391,6 +391,7 @@ void ui_load_screen(UIScreen* screen,
                     x, y, sx, sy, id, sheet, opacity,
                     ui_find_action(actions, actionCount, actionName),
                     text,
+                    font,
                     tag,
                     textScale
                 );
@@ -462,6 +463,7 @@ void ui_load_screen(UIScreen* screen,
                     x, y, w, h, style,
                     ui_find_action(actions, actionCount, actionName),
                     text,
+                    font,
                     tag,
                     textScale
                 );

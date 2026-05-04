@@ -3,12 +3,36 @@
 #include "ui_image.h"
 #include "text.h"
 #include "fonts/bigFont.h"
+#include "fonts/chatFont.h"
+#include "fonts/goldFont.h"
 #include "ui_window_button.h"
 #include "easing.h"
 #include "math_helpers.h"
 #include "ui_screen.h"
 
 #include "main.h"
+
+typedef struct {
+    const Charset *charset;
+    C2D_SpriteSheet *sheet;    
+} WindowButtonFont;
+
+static WindowButtonFont fonts[] = {
+    {
+        .charset = &bigFont_fontCharset,
+        .sheet = &bigFont_sheet
+    },
+    {
+        .charset = &chatFont_fontCharset,
+        .sheet = &chatFont_sheet
+    },
+    {
+        .charset = &goldFont_fontCharset,
+        .sheet = &goldFont_sheet
+    }
+};
+
+#define NUM_FONTS (sizeof(fonts) / sizeof(WindowButtonFont))
 
 static void ui_window_button_update(UIElement* e, UIInput* touch) {
     bool pressedTouch = hidKeysDown() & KEY_TOUCH;
@@ -66,14 +90,21 @@ static void ui_window_button_update(UIElement* e, UIInput* touch) {
 }
 
 static void ui_window_button_draw(UIElement* e) {
+    int font_id = e->window_button.font;
+
+    // Set to pusab if invalid
+    if (font_id >= NUM_FONTS) font_id = 0;
+
+    WindowButtonFont *font = &fonts[font_id];
+
     float scale = e->window_button.hoverScale;
     float text_scale;
 
     draw_9_slice(e->window_button.window.atlas, e->x, e->y, e->w * scale, e->h * scale, e->window_button.window.border, e->window_button.window.color);
 
-    if (e->window_button.textScale == 1.0f){
+    if (e->window_button.textScale == 0){
         // Get text length in pixels
-        float length = get_text_length(&bigFont_fontCharset, 1 / 0.85f, e->window_button.text);
+        float length = get_text_length(font->charset, 1 / 0.85f, e->window_button.text);
     
         if (e->w < length) {
             text_scale = scale * (e->w / length);
@@ -85,7 +116,7 @@ static void ui_window_button_draw(UIElement* e) {
     }
     
 
-    draw_text(&bigFont_fontCharset, &bigFont_sheet, e->x, e->y, text_scale, 0.5f, "%s", e->window_button.text);
+    draw_text(font->charset, font->sheet, e->x, e->y, text_scale, 0.5f, "%s", e->window_button.text);
 }
 
 void ui_window_button_set_style(UIElement *e, int style) {
@@ -100,6 +131,7 @@ UIElement ui_create_window_button(
     int x, int y, float w, float h, int style,
     UIActionFn action,
     char *text,
+    int font,
     char (*tag)[TAG_LENGTH],
     float textScale
 ){
@@ -125,6 +157,7 @@ UIElement ui_create_window_button(
     
     e.window_button.hoverScale = 1.f;
 
+    e.window_button.font = font;
     e.window_button.textScale = textScale;
 
     return e;

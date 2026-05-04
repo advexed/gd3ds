@@ -11,6 +11,7 @@ UIElement ui_create_window_button(
     int x, int y, float w, float h, int style,
     UIActionFn action,
     char *text,
+    int font,
     char (*tag)[TAG_LENGTH],
     float textScale
 );

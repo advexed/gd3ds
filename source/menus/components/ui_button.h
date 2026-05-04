@@ -10,6 +10,7 @@ UIElement ui_create_button(
     int x, int y, float sx, float sy, int sprite_index, int sheet, float opacity,
     UIActionFn action,
     char *text,
+    int font,
     char (*tag)[TAG_LENGTH],
     float textScale
 );

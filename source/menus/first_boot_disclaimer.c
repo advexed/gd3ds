@@ -39,9 +39,8 @@ void first_boot_disclaimer_init() {
 }
 
 int first_boot_disclaimer_loop() {
-    u32 kDown = hidKeysDown();
 
-    if (yes_exit || (kDown & KEY_B)) {
+    if (yes_exit) {
         cfg_save();
         return true;
     }

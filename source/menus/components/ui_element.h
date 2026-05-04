@@ -44,7 +44,7 @@ typedef struct {
 
     float scaleX;
     float scaleY;
-
+    int font;
     char text[64];
 
     float textScale;
@@ -147,7 +147,7 @@ typedef struct {
 
     float scaleX;
     float scaleY;
-
+    int font;
     char text[64];
 
     float textScale;
