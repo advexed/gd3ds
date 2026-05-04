@@ -104,11 +104,15 @@ void action_open_info_card(int id, UIElement* e) {
             break;
         case 8:
             // Switch trail color
-            set_info_content("Make the trail use P1 instead of P2.", "", false);
+            set_info_content("Make the player trail use P1", "instead of P2.", true);
             break;
         case 9:
             // Switch wave trail color
-            set_info_content("Make the wave trail use  P1 instead of P2.", "", false);
+            set_info_content("Make the wave trail use P1", "instead of P2.", true);
+            break;
+        case 10:
+            // quick retry info
+            set_info_content("Restarts in 0,5 seconds instead of 1.", "", false);
             break;
     }
     in_info_card = true;
