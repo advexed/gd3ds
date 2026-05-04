@@ -1,5 +1,6 @@
 #pragma once
 
+#define MAX_DECIMAL_PERCENT 17; 
 extern bool game_paused;
 
 void gameplay_screen_init();

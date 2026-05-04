@@ -170,7 +170,7 @@ int gameplay_screen_top_loop() {
 
     decimal = 0;
     if (decimalPercent) decimal = 2;
-    if (ultraDecimalPercent) decimal = 20;
+    if (ultraDecimalPercent) decimal = MAX_DECIMAL_PERCENT;
 
     progress_bar->progress_bar.value = state.level_progress;
     snprintf(percent->label.text, 32, "%.*f%%", decimal, state.level_progress);

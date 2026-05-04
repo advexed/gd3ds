@@ -760,15 +760,15 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     flip_other_player(state.current_player ^ 1);
                     UseEffect *effect = add_use_effect(objects.x[obj], objects.y[obj], obj, &portal_use_effect, GFX_TOP);
                     if (effect) {
-                        effect->def.colorR = 0 / 255.f;
+                        effect->def.colorR = 255 / 255.f;
                         effect->def.colorG = 200 / 255.f;
-                        effect->def.colorB = 255 / 255.f;
+                        effect->def.colorB = 0 / 255.f;
                     }
                     UseEffect *effect2 = add_use_effect(objects.x[obj], objects.y[obj], obj, &wave_radius_effect, GFX_TOP);
                     if (effect2) {
-                        effect2->def.colorR = 255 / 255.f;
-                        effect2->def.colorG = 255 / 255.f;
-                        effect2->def.colorB = 255 / 255.f;
+                        effect2->def.colorR = get_white_if_black(p1_color).r;
+                        effect2->def.colorG = get_white_if_black(p1_color).g;
+                        effect2->def.colorB = get_white_if_black(p1_color).b;
                     }
                 }
 
