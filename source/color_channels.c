@@ -87,6 +87,26 @@ void init_col_channels() {
     channels[CHANNEL_LBG].color.g = 255;
     channels[CHANNEL_LBG].color.b = 255;
     channels[CHANNEL_LBG].blending = true;
+
+    channels[CHANNEL_BLUE_GLOW].color.r = 0;
+    channels[CHANNEL_BLUE_GLOW].color.g = 255;
+    channels[CHANNEL_BLUE_GLOW].color.b = 255;
+    channels[CHANNEL_BLUE_GLOW].blending = true;
+
+    channels[CHANNEL_YELLOW_GLOW].color.r = 255;
+    channels[CHANNEL_YELLOW_GLOW].color.g = 255;
+    channels[CHANNEL_YELLOW_GLOW].color.b = 0;
+    channels[CHANNEL_YELLOW_GLOW].blending = true;
+
+    channels[CHANNEL_PINK_GLOW].color.r = 255;
+    channels[CHANNEL_PINK_GLOW].color.g = 0;
+    channels[CHANNEL_PINK_GLOW].color.b = 255;
+    channels[CHANNEL_PINK_GLOW].blending = true;
+
+    channels[WHITE].color.r = 255;
+    channels[WHITE].color.g = 255;
+    channels[WHITE].color.b = 255;
+    channels[WHITE].blending = true;
 }
 
 void handle_col_channel(int chan) {

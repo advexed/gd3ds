@@ -114,6 +114,10 @@ void action_open_info_card(int id, UIElement* e) {
             // quick retry info
             set_info_content("Restarts in 0,5 seconds instead of 1.", "", false);
             break;
+        case 11:
+            // solid trail info
+            set_info_content("Disables blending for the wave trail.", "", false);
+            break;
     }
     in_info_card = true;
 }

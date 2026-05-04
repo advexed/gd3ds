@@ -277,6 +277,28 @@ int get_glow_channel(int id) {
         case 741:
         case 742:
             return CHANNEL_LBG;
+        case 35:
+        case 36:
+            return CHANNEL_YELLOW_GLOW;
+        case 67:
+        case 84:
+            return CHANNEL_BLUE_GLOW;
+        case 140:
+        case 141:
+            return CHANNEL_PINK_GLOW;
+        case 200:
+        case 201:
+        case 202:
+        case 203:
+            return WHITE;
+        case 397:
+        case 398:
+        case 399:
+        case 675:
+        case 676:
+        case 677:
+            return CHANNEL_P1;
+
     }
     return CHANNEL_OBJ_BLENDING;
 }

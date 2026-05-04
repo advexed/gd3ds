@@ -22,6 +22,7 @@ extern bool ultraDecimalPercent;
 extern bool switchTrailColor;
 extern bool switchWaveTrailColor;
 extern bool quickRetry;
+extern bool solidWaveTrail;
 
 void settings_init();
 int settings_loop();

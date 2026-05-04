@@ -42,6 +42,7 @@ bool ultraDecimalPercent = false;
 bool switchTrailColor = false;
 bool switchWaveTrailColor = false;
 bool quickRetry = false;
+bool solidWaveTrail = false;
 
 
 static Setting settings[] = {
@@ -92,6 +93,9 @@ static Setting settings[] = {
     },
     {
         "chk_quickretry", &quickRetry
+    },
+    {
+        "chk_solidwavetrail", &solidWaveTrail
     },
 };
 
@@ -189,6 +193,10 @@ void quickRetry_settings(UIElement* e) {
     quickRetry = e->checkbox.checked;
 }
 
+void solidWaveTrail_settings(UIElement* e) {
+    solidWaveTrail = e->checkbox.checked;
+}
+
 void action_left_page(UIElement *e) {
     current_page--;
     if (current_page < 0) {
@@ -247,6 +255,10 @@ void action_info_quick_retry(UIElement *e) {
     action_open_info_card(10);
 }
 
+void action_info_solid_wave_trail(UIElement *e) {
+    action_open_info_card(11);
+}
+
 
 static UIAction actions[] = {
     { "exit", exit_settings },
@@ -266,6 +278,7 @@ static UIAction actions[] = {
     { "switchTrailColor", switchTrailColor_settings},
     { "switchWaveTrailColor", switchWaveTrailColor_settings},
     { "quickRetry", quickRetry_settings},
+    { "solidWaveTrail", solidWaveTrail_settings},
     { "left_page", action_left_page},
     { "right_page", action_right_page},
     { "wideinfo", action_info_wide},
@@ -278,6 +291,7 @@ static UIAction actions[] = {
     { "trailcolorinfo", action_info_trail},
     { "wavetrailcolorinfo", action_info_wave_trail},
     { "quickretryinfo", action_info_quick_retry},
+    { "solidwavetrailinfo", action_info_solid_wave_trail},
 };
 
 void settings_init() {
