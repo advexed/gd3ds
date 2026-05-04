@@ -108,7 +108,7 @@ void cube_gamemode(Player *player) {
     bool jump = false;
 
     drag_particles[state.current_player].emitterX = getLeft(player);
-    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -2 : 2);
     drag_particles[state.current_player].emitting = player->time_since_ground < DRAG_PARTICLES_FLOOR_DURATION;
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
@@ -236,6 +236,7 @@ void ship_gamemode(Player *player) {
     ship_secondary_particles[state.current_player].emitterY = y;
     ship_secondary_particles[state.current_player].emitting = true;
 
+    ship_secondary_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_secondary_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     drag_particles_2[state.current_player].emitterX = calc_x;
