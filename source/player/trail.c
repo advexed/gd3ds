@@ -84,7 +84,7 @@ void MotionTrail_Clear(MotionTrail *trail) {
     trail->previousNuPoints = 0;
 }
 
-void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke, bool waveTrail, Color color, C2D_Image tex) {
+void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke, bool waveTrail, bool blending, Color color, C2D_Image tex) {
     memset(trail, 0, sizeof(MotionTrail));
     trail->image = tex;  
     trail->maxPoints = MAX_TRAIL_POINTS;
@@ -95,7 +95,7 @@ void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke
     trail->waveTrail = waveTrail;
     trail->nuPoints = 0;
     trail->previousNuPoints = 0;
-    trail->blending = (color.r | color.g | color.b);
+    trail->blending = blending;
     if (!waveTrail) trail->appendNewPoints = true;
 }
 
@@ -316,6 +316,8 @@ void MotionTrail_AddWavePoint(MotionTrail* trail) {
 }
 
 void MotionTrail_Draw(MotionTrail* trail) {
+    change_blending(trail->blending);
+    
     C2D_Image image = trail->image;
 
     int count = trail->nuPoints * 2;
@@ -383,6 +385,8 @@ void MotionTrail_Draw(MotionTrail* trail) {
 }
 
 void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
+    change_blending(trail->blending);
+
     int count = trail->actualNuPoints * 2;
 
     for (int i = 0; i < count - 2; i++) {

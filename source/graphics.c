@@ -27,6 +27,8 @@ const Color white = { 255, 255, 255 };
 
 int sprite_count = 0;
 
+static bool blending_state = false;
+
 C2D_SpriteSheet spriteSheet;
 C2D_SpriteSheet spriteSheet2;
 C2D_SpriteSheet glowSheet;
@@ -842,6 +844,8 @@ void get_fade_vars(int obj, float x, int *fade_x, int *fade_y, float *fade_scale
 }
 
 void change_blending(bool blending) {
+    if (blending == blending_state) return;
+
     if (blending) {
         C2D_Flush();
         C3D_AlphaBlend(
@@ -858,6 +862,8 @@ void change_blending(bool blending) {
             GPU_ONE, GPU_ZERO);
         C2D_Prepare();
     }
+
+    blending_state = blending;
 }
 
 void draw_background(float x, float y) {
@@ -1077,7 +1083,6 @@ void create_objects() {
 
 void draw_objects() {
     u64 start = svcGetSystemTick();
-    int blend_enabled = false;
     // Draw
     for (size_t s = 0; s < sprite_count; s++) {
         SpriteObject *obj = viewable_objects_ptr[s];
@@ -1096,16 +1101,10 @@ void draw_objects() {
                 col = channels[col_channel];
             }
 
-            if (col.blending && !blend_enabled) {
-                change_blending(true);
-                blend_enabled = true;
-            } else if (!col.blending && blend_enabled) {
-                change_blending(false);
-                blend_enabled = false;
-            }
+            change_blending(col.blending);
 
             // Cull invisible objects
-            if ((col.color.r | col.color.g | col.color.b) == 0 && blend_enabled) continue;
+            if ((col.color.r | col.color.g | col.color.b) == 0 && col.blending) continue;
             
             C2D_DrawSpriteTinted(&obj->spr, &obj->tint);
 /*
@@ -1136,26 +1135,14 @@ void draw_objects() {
 
             draw_p1_trail(&state.player, 0);
             MotionTrail_Draw(&trail_p1);
-            
-            if (!wave_trail_p1.blending) {
-                change_blending(false);
-            }
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
-            if (!wave_trail_p1.blending) {
-                change_blending(true);
-            }
+            change_blending(true);
 
             draw_p1_trail(&state.player2, 1);
+            
             MotionTrail_Draw(&trail_p2);
-            if (!wave_trail_p2.blending) {
-                change_blending(false);
-            }
             MotionTrail_DrawWaveTrail(&wave_trail_p2);
-            if (wave_trail_p2.blending) {
-                change_blending(false);
-            }
-
-            blend_enabled = false;
+            change_blending(false);
             state.current_player = 0;
             draw_player(&state.player);
             
@@ -1171,12 +1158,13 @@ void draw_objects() {
             change_blending(false);
         }
     }
-    if (!blend_enabled) change_blending(true);
-        drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
-        drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
-        drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
-        drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
-        change_blending(false);
+
+    change_blending(true);
+    drawParticleSystem(&slow_speed_particles, 0, 0, 1.f);
+    drawParticleSystem(&normal_speed_particles, 0, 0, 1.f);
+    drawParticleSystem(&fast_speed_particles, 0, 0, 1.f);
+    drawParticleSystem(&faster_speed_particles, 0, 0, 1.f);
+    change_blending(false);
 
     if (state.hitbox_display) {
         for (size_t s = 0; s < sprite_count; s++) {

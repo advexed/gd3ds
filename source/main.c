@@ -858,6 +858,9 @@ int main(int argc, char* argv[]) {
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 
+    // Set to known value
+    change_blending(false);
+
     bool exit = false;
     while (aptMainLoop() && !exit) {
         // Update color if changed menus

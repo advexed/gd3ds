@@ -158,14 +158,14 @@ void init_variables() {
     Color used_p2 = (switchTrailColor ? p2_color : p1_color);
 
     C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, used_p1, img);
-    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, used_p2, img);
+    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, true, used_p1, img);
+    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, true, used_p2, img);
 
     used_p1 = (switchWaveTrailColor ? p1_color : p2_color);
     used_p2 = (switchWaveTrailColor ? p2_color : p1_color);
     
-    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, used_p1, img);
-    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, used_p2, img);
+    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b), used_p1, img);
+    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b), used_p2, img);
     MotionTrail_StopStroke(&trail_p1);
     MotionTrail_StopStroke(&trail_p2);
 
