@@ -246,6 +246,7 @@ void icon_kit_loop() {
         do {
             update_touch_effect(DT);
             
+            bool glow_enabled = (player_glow_enabled || ((p1_color.r | p1_color.g | p1_color.b) == 0));
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
             
             // Bottom screen
@@ -271,7 +272,7 @@ void icon_kit_loop() {
 
             ui_screen_draw(&screen_top);
             spawn_icon_at(
-                gamemode_page, *current_icons[gamemode_page], player_glow_enabled, 200, 120, 0, 0, 0, 2.f,
+                gamemode_page, *current_icons[gamemode_page], glow_enabled, 200, 120, 0, 0, 0, 2.f,
                 C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255),
                 C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255),
                 C2D_Color32(glow_color.r, glow_color.g, glow_color.b, 255)

@@ -1209,8 +1209,8 @@ void set_color_channels() {
 
                     channels[id].color = color;
 
-                    if (colorChannel.playerColor == 1) channels[id].color = p1_color;
-                    if (colorChannel.playerColor == 2) channels[id].color = p2_color; 
+                    if (colorChannel.playerColor == 1) channels[id].color = get_p2_if_black(p1_color);
+                    if (colorChannel.playerColor == 2) channels[id].color = get_p1_if_black(p2_color); 
 
                     if (id == CHANNEL_OBJ) {
                         channels[CHANNEL_OBJ_BLENDING].color = color;

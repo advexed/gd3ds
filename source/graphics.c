@@ -104,7 +104,28 @@ void update_player_colors() {
 }
 
 Color get_white_if_black(Color color) {
-    if (color.r == 0 && color.g == 0 && color.b == 0) return white;
+    if ((color.r | color.g | color.b) == 0) return white;
+    
+    return color;
+}
+
+Color get_p2_if_black(Color color) {
+    if ((color.r | color.g | color.b) == 0) {
+        if ((p2_color.r | p2_color.g | p2_color.b) == 0) {
+            return white;
+        }
+        return p2_color;
+    }
+    
+    return color;
+}
+Color get_p1_if_black(Color color) {
+    if ((color.r | color.g | color.b) == 0) {
+        if ((p1_color.r | p1_color.g | p1_color.b) == 0) {
+            return white;
+        }
+        return p1_color;
+    }
     
     return color;
 }
@@ -1115,13 +1136,25 @@ void draw_objects() {
 
             draw_p1_trail(&state.player, 0);
             MotionTrail_Draw(&trail_p1);
+            
+            if (!wave_trail_p1.blending) {
+                change_blending(false);
+            }
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
+            if (!wave_trail_p1.blending) {
+                change_blending(true);
+            }
 
             draw_p1_trail(&state.player2, 1);
             MotionTrail_Draw(&trail_p2);
+            if (!wave_trail_p2.blending) {
+                change_blending(false);
+            }
             MotionTrail_DrawWaveTrail(&wave_trail_p2);
+            if (wave_trail_p2.blending) {
+                change_blending(false);
+            }
 
-            change_blending(false);
             blend_enabled = false;
             state.current_player = 0;
             draw_player(&state.player);

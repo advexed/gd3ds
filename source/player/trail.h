@@ -49,7 +49,7 @@ typedef struct {
 
     Vec2 lastStopPosition;
     bool wasStopped;
-
+    bool blending;
 } MotionTrail;
 
 void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke, bool waveTrail, Color color, C2D_Image tex);

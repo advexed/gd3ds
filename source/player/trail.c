@@ -95,6 +95,7 @@ void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke
     trail->waveTrail = waveTrail;
     trail->nuPoints = 0;
     trail->previousNuPoints = 0;
+    trail->blending = (color.r | color.g | color.b);
     if (!waveTrail) trail->appendNewPoints = true;
 }
 
@@ -413,6 +414,8 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
             0
         );
     }
+
+    if (!trail->blending) return;
 
     // Draw center
     for (int i = 0; i < count - 2; i++) {

@@ -113,6 +113,8 @@ inline float normalize_angle(float a)
 void create_objects();
 void change_blending(bool blending);
 Color get_white_if_black(Color color);
+Color get_p1_if_black(Color color);
+Color get_p2_if_black(Color color);
 void draw_objects();
 void draw_background(float x, float y);
 void draw_ground(float cam_x, float cam_y, float y, bool is_ceiling, int screen_width);
