@@ -402,10 +402,6 @@ void ufo_gamemode(Player *player) {
                 player->gravity = player->mini ? -1308.96 : -1117.56;
             }
         }
-
-        if (player->on_ground) {
-            set_p_velocity(player, 0, true);
-        }
     }
 
     if (player->burst_particle_timer > 0) {
