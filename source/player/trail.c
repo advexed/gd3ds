@@ -57,19 +57,129 @@ void ccVertexLineToPolygon(const Vec2* points, float stroke, Vec2* outVerts, int
 }
 // Adds "vertical thickness" to a line strip by generating a triangle strip
 void ccVertexLineToPolygonWave(const Vec2* points, float stroke, Vec2* outVerts, int offset, int count) {
-    if (count <= 0) return;
+    if (count < 2) return;
 
-    float halfStroke = stroke / 2.0f;
+    float halfStroke = stroke * 0.5f;
 
     for (int i = offset; i < count; ++i) {
         Vec2 p = points[i];
 
-        // Offset vertically only (same x for both vertices)
-        outVerts[i * 2].x     = p.x;
-        outVerts[i * 2].y     = p.y + halfStroke;
+        Vec2 perp;
 
-        outVerts[i * 2 + 1].x = p.x;
-        outVerts[i * 2 + 1].y = p.y - halfStroke;
+        if (i == 0) {
+            Vec2 dir = {
+                points[1].x - p.x,
+                points[1].y - p.y
+            };
+
+            float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
+
+            if (len < 0.0001f)
+                len = 1.0f;
+
+            dir.x /= len;
+            dir.y /= len;
+
+            perp.x = -dir.y;
+            perp.y =  dir.x;
+
+            outVerts[i * 2].x     = p.x + perp.x * halfStroke;
+            outVerts[i * 2].y     = p.y + perp.y * halfStroke;
+
+            outVerts[i * 2 + 1].x = p.x - perp.x * halfStroke;
+            outVerts[i * 2 + 1].y = p.y - perp.y * halfStroke;
+        } else if (i == count - 1) {
+            Vec2 dir = {
+                p.x - points[i - 1].x,
+                p.y - points[i - 1].y
+            };
+
+            float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
+
+            if (len < 0.0001f)
+                len = 1.0f;
+
+            dir.x /= len;
+            dir.y /= len;
+
+            perp.x = -dir.y;
+            perp.y =  dir.x;
+
+            outVerts[i * 2].x     = p.x + perp.x * halfStroke;
+            outVerts[i * 2].y     = p.y + perp.y * halfStroke;
+
+            outVerts[i * 2 + 1].x = p.x - perp.x * halfStroke;
+            outVerts[i * 2 + 1].y = p.y - perp.y * halfStroke;
+        } else {
+            // Previous segment direction
+            Vec2 dirA = {
+                p.x - points[i - 1].x,
+                p.y - points[i - 1].y
+            };
+
+            // Next segment direction
+            Vec2 dirB = {
+                points[i + 1].x - p.x,
+                points[i + 1].y - p.y
+            };
+
+            float lenA = sqrtf(dirA.x * dirA.x + dirA.y * dirA.y);
+            float lenB = sqrtf(dirB.x * dirB.x + dirB.y * dirB.y);
+
+            if (lenA < 0.0001f) lenA = 1.0f;
+            if (lenB < 0.0001f) lenB = 1.0f;
+
+            dirA.x /= lenA;
+            dirA.y /= lenA;
+
+            dirB.x /= lenB;
+            dirB.y /= lenB;
+
+            // Normals
+            Vec2 nA = {
+                -dirA.y,
+                 dirA.x
+            };
+
+            Vec2 nB = {
+                -dirB.y,
+                 dirB.x
+            };
+
+            // Average normals
+            perp.x = nA.x + nB.x;
+            perp.y = nA.y + nB.y;
+
+            float perpLen = sqrtf(perp.x * perp.x + perp.y * perp.y);
+
+            // Nearly opposite directions
+            if (perpLen < 0.0001f) {
+                perp = nB;
+                perpLen = 1.0f;
+            }
+
+            perp.x /= perpLen;
+            perp.y /= perpLen;
+
+            float dot = dirA.x * dirB.x + dirA.y * dirB.y;
+
+            // Prevent division explosions
+            float denom = sqrtf(fmaxf((1.0f + dot) * 0.5f, 0.2f));
+
+            float miterScale = 1.0f / denom;
+
+            // Clamp sharp spikes
+            if (miterScale > 2.0f)
+                miterScale = 2.0f;
+
+            float finalStroke = halfStroke * miterScale;
+
+            outVerts[i * 2].x     = p.x + perp.x * finalStroke;
+            outVerts[i * 2].y     = p.y + perp.y * finalStroke;
+
+            outVerts[i * 2 + 1].x = p.x - perp.x * finalStroke;
+            outVerts[i * 2 + 1].y = p.y - perp.y * finalStroke;
+        }
     }
 }
 
@@ -91,11 +201,12 @@ void MotionTrail_Init(MotionTrail* trail, float fade, float minSeg, float stroke
     trail->fadeDelta = 1.0f / fade;
     trail->minSeg = minSeg * minSeg;  // Compare squared distance
     trail->stroke = stroke;
-    trail->displayedColor = color;
+    trail->color = color;
     trail->waveTrail = waveTrail;
     trail->nuPoints = 0;
     trail->previousNuPoints = 0;
     trail->blending = blending;
+    trail->opacity = 1.f;
     if (!waveTrail) trail->appendNewPoints = true;
 }
 
@@ -155,16 +266,14 @@ void MotionTrail_Update(MotionTrail* trail, float delta) {
                 newIdx2 = newIdx * 2;
                 trail->vertices[newIdx2] = trail->vertices[i2];
                 trail->vertices[newIdx2 + 1] = trail->vertices[i2 + 1];
-
-                i2 *= 4;
-                newIdx2 *= 4;
-                memcpy(&trail->colorPointer[newIdx2], &trail->colorPointer[i2], 8);
+                trail->opacities[newIdx2] = trail->opacities[i2];
+                trail->opacities[newIdx2 + 1] = trail->opacities[i2 + 1];
             }
-
-            newIdx2 = newIdx * 8;
+            
+            newIdx2 = newIdx * 2;
             u8 op = (u8)(trail->pointState[newIdx] * 255.0f);
-            trail->colorPointer[newIdx2 + 3] = op;
-            trail->colorPointer[newIdx2 + 7] = op;
+            trail->opacities[newIdx2] = op;
+            trail->opacities[newIdx2 + 1] = op;
         }
     }
 
@@ -185,16 +294,9 @@ void MotionTrail_Update(MotionTrail* trail, float delta) {
 
         trail->pointVertexes[idx] = trail->positionR;
         trail->pointState[idx] = 1.0f;
-
-        unsigned int offset = idx * 8;
-        trail->colorPointer[offset + 0] = trail->displayedColor.r;
-        trail->colorPointer[offset + 1] = trail->displayedColor.g;
-        trail->colorPointer[offset + 2] = trail->displayedColor.b;
-        trail->colorPointer[offset + 3] = 255;
-        trail->colorPointer[offset + 4] = trail->displayedColor.r;
-        trail->colorPointer[offset + 5] = trail->displayedColor.g;
-        trail->colorPointer[offset + 6] = trail->displayedColor.b;
-        trail->colorPointer[offset + 7] = 255;
+        int offset = idx * 2;
+        trail->opacities[offset] = 255;
+        trail->opacities[offset + 1] = 255;
 
         trail->nuPoints++;
         
@@ -230,10 +332,6 @@ void MotionTrail_UpdateWaveTrail(MotionTrail* trail, float delta) {
     unsigned int startIdx = 0;
     trail->offscreenCount = 0;
     
-    // Update stroke width
-    float size_value = 20.f * map_range(amplitude, 0.f, 1.f, 0.1f, 1.f);
-    trail->stroke = size_value;
-    
     // Get offscreen points
     for (unsigned int i = 0; i < trail->actualNuPoints; i++) {
         float x = trail->pointVertexes[i].x;
@@ -259,16 +357,7 @@ void MotionTrail_UpdateWaveTrail(MotionTrail* trail, float delta) {
             unsigned int newIdx2 = newIdx * 2;
             trail->vertices[newIdx2] = trail->vertices[i2];
             trail->vertices[newIdx2 + 1] = trail->vertices[i2 + 1];
-
-            i2 *= 4;
-            newIdx2 *= 4;
-            memcpy(&trail->colorPointer[newIdx2], &trail->colorPointer[i2], 8);
         }
-
-        // Set opacity
-        unsigned int colorIdx = newIdx * 8;
-        trail->colorPointer[colorIdx + 3] = 255 * trail->opacity;
-        trail->colorPointer[colorIdx + 7] = 255 * trail->opacity;
     }
 
     trail->nuPoints -= mov;
@@ -295,16 +384,6 @@ void MotionTrail_AddWavePoint(MotionTrail* trail) {
     trail->startingPositionInitialized = true;
     trail->pointState[idx] = 1.0f;
 
-    unsigned int offset = idx * 8;
-    trail->colorPointer[offset + 0] = trail->displayedColor.r;
-    trail->colorPointer[offset + 1] = trail->displayedColor.g;
-    trail->colorPointer[offset + 2] = trail->displayedColor.b;
-    trail->colorPointer[offset + 3] = 255;
-    trail->colorPointer[offset + 4] = trail->displayedColor.r;
-    trail->colorPointer[offset + 5] = trail->displayedColor.g;
-    trail->colorPointer[offset + 6] = trail->displayedColor.b;
-    trail->colorPointer[offset + 7] = 255;
-
     trail->nuPoints++;
 
     if (trail->nuPoints > 1) {
@@ -321,6 +400,8 @@ void MotionTrail_Draw(MotionTrail* trail) {
     C2D_Image image = trail->image;
 
     int count = trail->nuPoints * 2;
+
+    Color color = trail->color;
 
     bool rotated = Tex3DS_SubTextureRotated(trail->image.subtex);
 
@@ -342,13 +423,13 @@ void MotionTrail_Draw(MotionTrail* trail) {
         float x2 = get_mirror_x((p2.x - state.camera_x), state.mirror_factor);
         float y2 = SCREEN_HEIGHT - ((p2.y - state.camera_y));
 
-        u8* c0 = &trail->colorPointer[i0 * 4];
-        u8* c1 = &trail->colorPointer[i1 * 4];
-        u8* c2 = &trail->colorPointer[i2 * 4];
-
         Tex2F t0 = trail->texCoords[i0];
         Tex2F t1 = trail->texCoords[i1];
         Tex2F t2 = trail->texCoords[i2];
+        
+        int opacity1 = trail->opacities[i0] * trail->opacity;
+        int opacity2 = trail->opacities[i1] * trail->opacity;
+        int opacity3 = trail->opacities[i2] * trail->opacity;
 
         const Tex3DS_SubTexture *subtex = trail->image.subtex;
 
@@ -376,9 +457,9 @@ void MotionTrail_Draw(MotionTrail* trail) {
         }
 
         C2D_DrawTriangleUV(
-            x0, y0, u0, v0, C2D_Color32(c0[0], c0[1], c0[2], c0[3]), 
-            x1, y1, u1, v1, C2D_Color32(c1[0], c1[1], c1[2], c1[3]), 
-            x2, y2, u2, v2, C2D_Color32(c2[0], c2[1], c2[2], c2[3]), 
+            x0, y0, u0, v0, C2D_Color32(color.r, color.g, color.b, opacity1), 
+            x1, y1, u1, v1, C2D_Color32(color.r, color.g, color.b, opacity2), 
+            x2, y2, u2, v2, C2D_Color32(color.r, color.g, color.b, opacity3), 
             0, image
         );       
     }
@@ -388,6 +469,9 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
     change_blending(trail->blending);
 
     int count = trail->actualNuPoints * 2;
+
+    Color color = trail->color;
+    int opacity = 255 * trail->opacity;
 
     for (int i = 0; i < count - 2; i++) {
         int i0 = i;
@@ -407,14 +491,10 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
         float x2 = get_mirror_x((p2.x - state.camera_x), state.mirror_factor);
         float y2 = SCREEN_HEIGHT - ((p2.y - state.camera_y));
 
-        u8* c0 = &trail->colorPointer[i0 * 4];
-        u8* c1 = &trail->colorPointer[i1 * 4];
-        u8* c2 = &trail->colorPointer[i2 * 4];
-
         C2D_DrawTriangle(
-            x0, y0, C2D_Color32(c0[0], c0[1], c0[2], c0[3]),
-            x1, y1, C2D_Color32(c1[0], c1[1], c1[2], c1[3]),
-            x2, y2, C2D_Color32(c2[0], c2[1], c2[2], c2[3]),
+            x0, y0, C2D_Color32(color.r, color.g, color.b, opacity),
+            x1, y1, C2D_Color32(color.r, color.g, color.b, opacity),
+            x2, y2, C2D_Color32(color.r, color.g, color.b, opacity),
             0
         );
     }
@@ -441,9 +521,9 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
         float y2 = SCREEN_HEIGHT - ((p2.y - state.camera_y));
 
         C2D_DrawTriangle(
-            x0, y0, C2D_Color32(165, 165, 165, 255 * trail->opacity),
-            x1, y1, C2D_Color32(165, 165, 165, 255 * trail->opacity),
-            x2, y2, C2D_Color32(165, 165, 165, 255 * trail->opacity),
+            x0, y0, C2D_Color32(165, 165, 165, opacity),
+            x1, y1, C2D_Color32(165, 165, 165, opacity),
+            x2, y2, C2D_Color32(165, 165, 165, opacity),
             0
         );
     }

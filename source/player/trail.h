@@ -35,14 +35,14 @@ typedef struct {
     float stroke;
 
     Vec2 positionR;
-    Color displayedColor;
+    Color color;
 
     C2D_Image image;
 
     float pointState[MAX_TRAIL_POINTS];
     Vec2 pointVertexes[MAX_TRAIL_POINTS];
     Vec2 vertices[MAX_TRAIL_POINTS * 2];
-    u8 colorPointer[MAX_TRAIL_POINTS * 8]; // RGBA * 2 per point
+    u8 opacities[MAX_TRAIL_POINTS * 2];
     Tex2F texCoords[MAX_TRAIL_POINTS * 2];
     
     Vec2 centerVertices[MAX_TRAIL_POINTS * 2];
