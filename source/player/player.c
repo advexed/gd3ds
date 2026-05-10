@@ -659,36 +659,11 @@ void run_player(Player *player) {
     }
 
     if (player->gamemode == GAMEMODE_DART) {    
+        wave_trail->positionR = (Vec2){player->x, player->y};  
+        wave_trail->startingPositionInitialized = true;
         if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
-            wave_trail->positionR = (Vec2){player->x, player->y};  
-            wave_trail->startingPositionInitialized = true;
             MotionTrail_AddWavePoint(wave_trail);
         } else {     
-            float diff_x = (player->x - state.old_player.x);
-            float diff_y = (player->y - state.old_player.y);
-            float angle_rad = atan2f(-diff_y, diff_x);
-
-            float scale = (player->mini) ? 0.6f : 1.f;
-            float rad = C3D_AngleFromDegrees(RadToDeg(angle_rad));
-            float cos_r = cosf(rad);
-            float sin_r = sinf(rad);
-
-            float m00 = cos_r;
-            float m01 = sin_r;
-            float m10 = -sin_r;
-            float m11 = cos_r;
-
-            const float local_x = -8;
-            const float local_y = 0;
-
-            float rot_x = local_x * m00 + local_y * m01;
-            float rot_y = local_x * m10 + local_y * m11;
-
-            float x = player->x + rot_x * scale;
-            float y = player->y + rot_y * scale;
-
-            wave_trail->positionR = (Vec2){x, y};  
-            wave_trail->startingPositionInitialized = true;
         }
     }
 
