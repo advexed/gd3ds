@@ -13,6 +13,9 @@
 #include "particles/object_particles.h"
 #include "particles/circles.h"
 
+Player *player_1 = &state.player;
+Player *player_2 = &state.player2;
+
 const float jump_heights_table[SPEED_COUNT][JUMP_TYPES_COUNT][GAMEMODE_COUNT][2] = {
     { // SLOW               CUBE                   SHIP                  BALL                    UFO                 WAVE   },
     /* YELLOW PAD */ {{864,      691.2},    {432,      508.248},  {518.4,       414.72002},   {573.48,   458.784},  {0, 0} },
@@ -277,6 +280,18 @@ void setup_dual() {
     memset(&state.player2.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_DURATION);
     state.player2.p1_trail_pos = 0;
     state.player2.upside_down = state.player.upside_down ^ 1;
+    UseEffect *effect = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &portal_use_effect, GFX_TOP);
+    if (effect) {
+        effect->def.colorR = get_white_if_black(p1_color).r;
+        effect->def.colorG = get_white_if_black(p1_color).g;
+        effect->def.colorB = get_white_if_black(p1_color).b;
+    }
+    UseEffect *effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &portal_use_effect, GFX_TOP);
+    if (effect2) {
+        effect2->def.colorR = get_white_if_black(p2_color).r;
+        effect2->def.colorG = get_white_if_black(p2_color).g;
+        effect2->def.colorB = get_white_if_black(p2_color).b;
+    }
 }
 
 // Handle collision with special objects (orbs, pads, portals)
@@ -530,6 +545,21 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorG = 255 / 255.f;
                         effect->def.colorB = 50 / 255.f;
                     }
+                    if (state.current_player == 0) {
+                        UseEffect *effect2 = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &portal_use_effect, GFX_TOP);
+                        if (effect2) {
+                            effect2->def.colorR = 0 / 255.f;
+                            effect2->def.colorG = 255 / 255.f;
+                            effect2->def.colorB = 50 / 255.f;
+                        }
+                    } else {
+                        UseEffect *effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &portal_use_effect, GFX_TOP);
+                        if (effect2) {
+                            effect2->def.colorR = 0 / 255.f;
+                            effect2->def.colorG = 255 / 255.f;
+                            effect2->def.colorB = 50 / 255.f;
+                        }
+                    }                    
                 }
                 SET_ACTIVATED(obj, true);
             }
@@ -545,6 +575,21 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                         effect->def.colorG = 31 / 255.f;
                         effect->def.colorB = 255 / 255.f;
                     }
+                    if (state.current_player == 0) {
+                        UseEffect *effect2 = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &portal_use_effect, GFX_TOP);
+                        if (effect2) {
+                            effect2->def.colorR = 255 / 255.f;
+                            effect2->def.colorG = 31 / 255.f;
+                            effect2->def.colorB = 255 / 255.f;
+                        }
+                    } else {
+                        UseEffect *effect2 = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &portal_use_effect, GFX_TOP);
+                        if (effect2) {
+                            effect2->def.colorR = 255 / 255.f;
+                            effect2->def.colorG = 31 / 255.f;
+                            effect2->def.colorB = 255 / 255.f;
+                        }
+                    }    
                 }
                 SET_ACTIVATED(obj, true);
             }
