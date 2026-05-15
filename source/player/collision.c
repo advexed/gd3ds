@@ -483,6 +483,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case ORANGE_MIRROR_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 if (state.intended_mirror_factor != 1.f) {
+                    MotionTrail_StopStroke(trail);
                     state.mirroring = true;
                     state.mirror_timer = 0;
                     state.original_mirror_factor = state.mirror_factor;
@@ -501,6 +502,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
         case BLUE_MIRROR_PORTAL:
             if (!GET_ACTIVATED(obj)) {
                 if (state.intended_mirror_factor != 0.f) {
+                    MotionTrail_StopStroke(trail);
                     state.mirroring = true;
                     state.mirror_timer = 0;
                     state.original_mirror_factor = state.mirror_factor;

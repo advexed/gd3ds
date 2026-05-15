@@ -643,8 +643,8 @@ void game_loop() {
             MotionTrail_UpdateWaveTrail(&wave_trail_p2, delta);
             update_p1_trail(&state.player2, 1);
             
-            // If not dual and not ending the level, fade the p2 wave trial (doesn't work for the ending the level part oops)
-            if (!state.dual || state.player.cutscene_timer > 0) {
+            // If not dual, fade the p2 wave trial
+            if (!state.dual) {
                 if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * 240) * delta;
                 
                 if (wave_trail_p2.opacity <= 0) {

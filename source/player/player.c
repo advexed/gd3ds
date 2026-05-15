@@ -477,7 +477,7 @@ void wave_gamemode(Player *player) {
     trail->positionR = (Vec2){x, y};  
     trail->startingPositionInitialized = true;
  
-    if (player->cutscene_timer == 0) wave_trail->opacity = 1.f;
+    if (player->cutscene_timer == 0 && !state.mirroring) wave_trail->opacity = 1.f;
 
     if (player->buffering_state == BUFFER_READY) player->buffering_state = BUFFER_END;
 
@@ -576,7 +576,7 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
             ship_gamemode(player);
             break;
         case GAMEMODE_PLAYER_BALL:
@@ -586,17 +586,19 @@ void run_player(Player *player) {
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring) MotionTrail_ResumeStroke(trail);
             ufo_gamemode(player);
             break;
         case GAMEMODE_DART:
             glitter_particles.emitterX = state.camera_x_middle;
             glitter_particles.emitterY = state.camera_y_middle;
             glitter_particles.emitting = true;
-            if (noWaveTrailBehind) {
-                MotionTrail_StopStroke(trail);
-            } else {
-                MotionTrail_ResumeStroke(trail);
+            if (!state.mirroring) {
+                if (noWaveTrailBehind) {
+                    MotionTrail_StopStroke(trail);
+                } else {
+                    MotionTrail_ResumeStroke(trail);
+                }
             }
             wave_gamemode(player);
             break;
@@ -604,8 +606,8 @@ void run_player(Player *player) {
     
     player->time_since_ground += STEPS_DT;
 
-    // Fade wave trail if not in wave anymore or end animation started
-    if (player->gamemode != GAMEMODE_DART || player->cutscene_timer > 0) {
+    // Fade wave trail if not in wave anymore or end animation started or mirror portal animation is happening
+    if (player->gamemode != GAMEMODE_DART || state.mirroring || player->cutscene_timer > 0) {
         if (wave_trail->opacity > 0) wave_trail->opacity -= 0.02f;
         
         if (wave_trail->opacity <= 0) {
@@ -679,7 +681,7 @@ void run_player(Player *player) {
     }
 
     // Handle wave trail point adding
-    if (player->gamemode == GAMEMODE_DART) {    
+    if (player->gamemode == GAMEMODE_DART && !state.mirroring) {    
         wave_trail->positionR = (Vec2){player->x, player->y};  
         wave_trail->startingPositionInitialized = true;
         if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
